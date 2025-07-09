@@ -8,7 +8,7 @@ from flowlauncher import FlowLauncher
 
 # 添加根目录到sys.path
 sys.path.append(dirname(dirname(dirname(abspath(__file__)))))
-from src.core.config import cfg
+from src.core.config import config
 from src.core.factory import ConcreteFactory
 from src.core.filter import Fuzzy_Filter
 from src.core.logger import get_logger
@@ -41,17 +41,17 @@ class RecentProjectsOpen(FlowLauncher):
             logger.debug(f"app_name: {app_name}")
         icon_path = "icons/{}_icon.png".format(acronyms)
         query = "".join(args.split(" ")[1:])
-        # 读取配置文件，如果配置文件中有对应的app_download和app_storage
-        # settings = JsonRPCClient().recieve().get("settings", {})
-        # 读取.env配置文件
+        
+        # 读取配置
         try:
-            app_download = cfg.get(app_name + "_DOWNLOAD")
-            app_storage = cfg.get(app_name + "_STORAGE")
+            app_download = config.get(app_name + "_DOWNLOAD")
+            app_storage = config.get(app_name + "_STORAGE")
         except UsageError as e:
             return MessageDTO.asWarnFlowMessage(
                 "{0} app_download or app_storage is None".format(app_name) + str(e),
                 "Please check your settings",
             )
+        logger.debug(f"app_download: {app_download}, app_storage: {app_storage}")
         # 读取recent_projects
         try:
             app = ConcreteFactory.create_app(app_name, app_download, app_storage)

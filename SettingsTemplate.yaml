@@ -1,4 +1,15 @@
+# yaml-language-server: $schema=https://www.flowlauncher.com/schemas/settings-template.schema.json
 body:
-  - type: textBlock
+  - type: textarea
     attributes:
-      description: Please write C:\Users\YourUsername\AppData\Local\FlowLauncher\app-1.19.3\UserData\Plugins\RecentProjectsOpen-1.0.0\src\.env
+      name: program_path
+      label: Program Path
+      description: >
+        Configure application paths in the following format:
+        
+        APP_DOWNLOAD=C:/path/to/app.exe
+        
+        APP_STORAGE=C:/path/to/storage/file
+
+        Each application needs both DOWNLOAD and STORAGE entries.
+      defaultValue: ""

@@ -40,49 +40,42 @@ You can access different IDEs using the following format:
 
 ## Configuration
 
-To configure the `RecentProjectsOpen` plugin, you should edit the plugin's configuration file.
+All configurations can be done in the Settings Panel. Change the configurations as needed and they will be applied immediately.
 
-1. **Locate the Configuration File**:
+### Program Path
 
-   - The plugin's configuration file is located at:
-
-     ```plaintext
-     C:\Users\YourUsername\AppData\Local\FlowLauncher\app-1.19.3\UserData\Plugins\RecentProjectsOpen-1.0.0\src\.env
-     ```
-
-   - Replace `YourUsername` with your actual Windows username.
-
-2. **Edit the File**:
-
-   - Open the `.env` file with a text editor (e.g., Notepad, Visual Studio Code).
-   - Add or modify the paths for your IDEs and their storage files as shown in the example above.
+- Configure application paths in the following format:
 
    ```plaintext
-      VSCODE_DOWNLOAD=D:/VSCode/bin/code
-      VSCODE_STORAGE=C:/Users/YourUsername/AppData/Roaming/Code/User/globalStorage/storage.json
-      ANDROID_STUDIO_DOWNLOAD=D:/Android Studio/bin/studio64.exe
-      ANDROID_STUDIO_STORAGE=C:/Users/YourUsername/AppData/Roaming/Google/AndroidStudio2024.1/options/recentProjects.xml
-      INTELLIJ_IDEA_DOWNLOAD=D:/IntelliJ IDEA 2024.3/bin/idea64.exe
-      INTELLIJ_IDEA_STORAGE=C:/Users/YourUsername/AppData/Roaming/JetBrains/IntelliJIdea2024.3/options/recentProjects.xml
-      GOLAND_DOWNLOAD=D:/goland/GoLand 2023.2/bin/goland64.exe
-      GOLAND_STORAGE=C:/Users/YourUsername/AppData/Roaming/JetBrains/GoLand2023.2/options/recentProjects.xml
-      CLION_DOWNLOAD=D:/Clion/CLion 2024.1.4/bin/clion64.exe
-      CLION_STORAGE=C:/Users/YourUsername/AppData/Roaming/JetBrains/CLion2024.1/options/recentProjects.xml
-      CURSOR_DOWNLOAD=C:/Users/YourUsername/AppData/Local/Programs/cursor/Cursor.exe
-      CURSOR_STORAGE=C:/Users/YourUsername/AppData/Roaming/Cursor/globalStorage/storage.json
-      TYPORA_DOWNLOAD=D:/Typora/Typora.exe
-      TYPORA_STORAGE=C:/Users/YourUsername/AppData/Roaming/Typora/history.data
+   APP_DOWNLOAD=C:/path/to/app.exe
+   APP_STORAGE=C:/path/to/storage/file
    ```
 
-3. **Save and Restart**:
+- Each application needs both DOWNLOAD and STORAGE entries
+- Example configuration:
 
-   - Save the changes and restart Flow Launcher to apply the new configuration.
+   ```plaintext
+   VSCODE_DOWNLOAD=D:/VSCode/bin/code
+   VSCODE_STORAGE=C:/Users/YourUsername/AppData/Roaming/Code/User/globalStorage/storage.json
+   ANDROID_STUDIO_DOWNLOAD=D:/Android Studio/bin/studio64.exe
+   ANDROID_STUDIO_STORAGE=C:/Users/YourUsername/AppData/Roaming/Google/AndroidStudio2024.1/options/recentProjects.xml
+   INTELLIJ_IDEA_DOWNLOAD=D:/IntelliJ IDEA 2024.3/bin/idea64.exe
+   INTELLIJ_IDEA_STORAGE=C:/Users/YourUsername/AppData/Roaming/JetBrains/IntelliJIdea2024.3/options/recentProjects.xml
+   GOLAND_DOWNLOAD=D:/goland/GoLand 2023.2/bin/goland64.exe
+   GOLAND_STORAGE=C:/Users/YourUsername/AppData/Roaming/JetBrains/GoLand2023.2/options/recentProjects.xml
+   CLION_DOWNLOAD=D:/Clion/CLion 2024.1.4/bin/clion64.exe
+   CLION_STORAGE=C:/Users/YourUsername/AppData/Roaming/JetBrains/CLion2024.1/options/recentProjects.xml
+   CURSOR_DOWNLOAD=C:/Users/YourUsername/AppData/Local/Programs/cursor/Cursor.exe
+   CURSOR_STORAGE=C:/Users/YourUsername/AppData/Roaming/Cursor/globalStorage/storage.json
+   TYPORA_DOWNLOAD=D:/Typora/Typora.exe
+   TYPORA_STORAGE=C:/Users/YourUsername/AppData/Roaming/Typora/history.data
+   ```
 
 ### Tips
 
-- **Verify Paths**: Ensure that the paths you enter are correct and that the files or executables exist at those locations.
-- **Permissions**: Make sure that Flow Launcher has the necessary permissions to access the specified directories and files.
-- **Backup**: Before making changes to the `.env` file, create a backup copy in case you need to revert to the original settings.
+- **Verify Paths**: Ensure that the paths you enter are correct and that the files or executables exist at those locations
+- **Permissions**: Make sure that Flow Launcher has the necessary permissions to access the specified directories and files
+- **Path Format**: Use forward slashes (`/`) or double backslashes (`\\`) in Windows paths
 
 ## Usage
 

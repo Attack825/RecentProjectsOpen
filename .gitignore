@@ -162,3 +162,7 @@ cython_debug/
 # .history
 .history/
 .vscode/
+
+# temporary files
+temp
+temp.*
