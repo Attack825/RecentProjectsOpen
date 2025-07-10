@@ -34,5 +34,18 @@ body:
 
         If you change it, please update here as well.
       defaultValue: "r"
+  - type: textarea
+    attributes:
+      name: custom_acronyms_map
+      label: Custom Acronyms Map
+      description: >
+        Configure custom acronyms for your programs in the following format:
+
+        VSCODE=vsc
+
+        PYCHARM=py
+
+        Each line defines a mapping from the program name to its acronyms.
+      defaultValue: ""
 
 

@@ -21,13 +21,11 @@ class RecentProjectsOpen(FlowLauncher):
 
     def query(self, param: str) -> List[Dict[str, str]]:
         args = param.strip()
-        acronyms_dict = ConcreteFactory.get_application_acronyms()
+        acronyms_dict = ConcreteFactory.get_application_acronyms(config)
 
         # 如果没有输入参数，则根据 acronyms_suggestions_list 展示建议列表
         if len(args) == 0:
-            plugin_trigger_keyword = config.get("plugin_trigger_keyword") if "plugin_trigger_keyword" in config else "r"
-            acronyms_suggestions_list = config.get("acronyms_suggestions_list") if "acronyms_suggestions_list" in config else None
-            return ConcreteFactory.get_application_message(plugin_trigger_keyword, acronyms_suggestions_list)
+            return ConcreteFactory.get_application_message(config)
 
         acronyms = args.split(" ")[0]
 
@@ -38,7 +36,7 @@ class RecentProjectsOpen(FlowLauncher):
             )
         else:
             app_name = acronyms_dict[acronyms]
-        icon_path = "icons/{}_icon.png".format(acronyms)
+        icon_path = f"icons/{app_name}.png"
         query = "".join(args.split(" ")[1:])
 
         # 读取配置

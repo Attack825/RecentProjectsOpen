@@ -26,21 +26,34 @@ class Config(dict):
                 if line and "=" in line:
                     key, value = line.split("=", 1)
                     self[key.strip()] = value.strip()
+        
         # 解析 acronyms_suggestions_list 配置
         acronyms_suggestions_list = flow_settings.get("acronyms_suggestions_list") if "acronyms_suggestions_list" in flow_settings else None
         if acronyms_suggestions_list:
             self["acronyms_suggestions_list"] = [s.strip() for s in acronyms_suggestions_list.split("\n") if s.strip()]
+        
+
+        # 解析 acronyms_map 配置
+        acronyms_map = flow_settings.get("custom_acronyms_map") if "custom_acronyms_map" in flow_settings else None
+        if acronyms_map:
+            self["custom_acronyms_map"] = {}
+            for line in acronyms_map.split("\n"):
+                line = line.strip()
+                if line and "=" in line:
+                    prog, acr = line.split("=", 1)
+                    prog = prog.strip().upper()
+                    acr = acr.strip()
+                    self["custom_acronyms_map"][prog] = acr
+
         # 解析其他配置
         for key, value in flow_settings.items():
-            if key not in self and key not in ("acronyms_suggestions_list", "program_path"):
+            if key not in self and key not in ("acronyms_suggestions_list", "program_path", "custom_acronyms_map"):
                 self[key] = value
 
-    def get(self, key: str) -> str:
-        """获取配置值，如果不存在则抛出异常"""
-        value = super().get(key)
-        if not value:
-            raise UsageError(f"Missing config key: {key}")
-        return value
+
+    def get(self, key: str, default=None) -> str:
+        """获取配置值，支持默认值参数"""
+        return super().get(key, default)
 
 
 config = Config()
