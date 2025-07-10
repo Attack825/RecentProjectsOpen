@@ -41,13 +41,23 @@ class TestConfig(unittest.TestCase):
 
     @patch("src.core.config.settings")
     def test_empty_settings(self, mock_settings):
-        """测试空配置的情况"""
+        """测试空配置"""
         mock_settings.return_value = {}
 
         config = Config()
 
-        with self.assertRaises(Exception):
-            config.get("NONEXISTENT_KEY")
+        self.assertIsNone(config.get("NONEXISTENT_KEY"))
+
+    @patch("src.core.config.settings")
+    def test_settings_default_value(self, mock_settings):
+        """测试配置默认值"""
+        mock_settings.return_value = {}
+
+        config = Config()
+
+        self.assertEqual(
+            config.get("NONEXISTENT_KEY", "default_value"), "default_value"
+        )
 
 
 if __name__ == "__main__":
