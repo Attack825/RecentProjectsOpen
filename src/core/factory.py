@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List
+from typing import Dict
 
 from .registry import ApplicationRegistry
 from .logger import get_logger
@@ -46,7 +46,7 @@ class ConcreteFactory(AbstractFactory):
         }
         """
         ApplicationRegistry.load_applications()
-        default_acronyms_map = ApplicationRegistry.get_acronyms_map()  
+        default_acronyms_map = ApplicationRegistry.get_acronyms_map()
         custom_acronyms_map = plugin_config.get("custom_acronyms_map", {})
         acronyms_map = {acr: prog.upper() for prog, acr in custom_acronyms_map.items()}
         for acr, prog in default_acronyms_map.items():
@@ -64,7 +64,7 @@ class ConcreteFactory(AbstractFactory):
         plugin_trigger_keyword = plugin_config.get("plugin_trigger_keyword", "r")
         acronyms_dict = cls.get_application_acronyms(plugin_config)
         reverse_acronyms_dict = {v: k for k, v in acronyms_dict.items()}
-        
+
         # 只显示已配置的应用建议
         if suggestions_list is None:
             suggestions_list = []
@@ -73,21 +73,26 @@ class ConcreteFactory(AbstractFactory):
                 storage_key = program_name + "_STORAGE"
                 if download_key in plugin_config and storage_key in plugin_config:
                     suggestions_list.append(program_name)
-                    
+
         messages = []
         for idx, program_name in enumerate(suggestions_list):
             if program_name in reverse_acronyms_dict:
                 acronyms = reverse_acronyms_dict[program_name]
-                messages.append({
-                    "title": program_name,
-                    "subTitle": acronyms,
-                    "icoPath": f"icons/{program_name}.png",
-                    "jsonRPCAction": {
-                        "method": "Flow.Launcher.ChangeQuery",
-                        "parameters": [f"{plugin_trigger_keyword} {acronyms} ", False],
-                        "dontHideAfterAction": True,
-                    },
-                    # 按原始顺序排序
-                    "score": (100 - idx) * 10000,
-                })
+                messages.append(
+                    {
+                        "title": program_name,
+                        "subTitle": acronyms,
+                        "icoPath": f"icons/{program_name}.png",
+                        "jsonRPCAction": {
+                            "method": "Flow.Launcher.ChangeQuery",
+                            "parameters": [
+                                f"{plugin_trigger_keyword} {acronyms} ",
+                                False,
+                            ],
+                            "dontHideAfterAction": True,
+                        },
+                        # 按原始顺序排序
+                        "score": (100 - idx) * 10000,
+                    }
+                )
         return messages

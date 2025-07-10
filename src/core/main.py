@@ -48,7 +48,7 @@ class RecentProjectsOpen(FlowLauncher):
                 "{0} app_download or app_storage is None".format(app_name) + str(e),
                 "Please check your settings",
             )
-        
+
         # 读取recent_projects
         try:
             app = ConcreteFactory.create_app(app_name, app_download, app_storage)
