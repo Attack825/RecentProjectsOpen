@@ -21,13 +21,13 @@ class RecentProjectsOpen(FlowLauncher):
 
     def query(self, param: str) -> List[Dict[str, str]]:
         args = param.strip()
-        acronyms_dict = ConcreteFactory.get_application_acronyms(config)
 
-        # 如果没有输入参数，则根据 acronyms_suggestions_list 展示建议列表
+        # 如果没有输入参数，则根据 suggestions_list 展示建议列表
         if len(args) == 0:
             return ConcreteFactory.get_application_message(config)
 
         acronyms = args.split(" ")[0]
+        acronyms_dict = ConcreteFactory.get_application_acronyms(config)
 
         if acronyms not in acronyms_dict.keys():
             return MessageDTO.asWarnFlowMessage(

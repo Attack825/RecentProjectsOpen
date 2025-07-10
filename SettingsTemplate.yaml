@@ -15,16 +15,21 @@ body:
       defaultValue: ""
   - type: textarea
     attributes:
-      name: acronyms_suggestions_list
-      label: Acronyms Suggestions List
+      name: suggestions_list
+      label: Suggestions List
       description: >
-        Configure the list of acronyms suggestions.
+        Configure list of program suggestions in the following format:
+
+        VSCODE
+
+        PYCHARM
+
+        INTELLIJ_IDEA
 
         It will be displayed when the plugin is activated.
 
-        Each acronym should be defined on a new line.
-
-        Keep empty to display the default acronyms suggestions.
+        Keep empty to display the default program suggestions.
+  - type: input
   - type: input
     attributes:
       name: plugin_trigger_keyword

@@ -27,27 +27,27 @@ class Config(dict):
                     key, value = line.split("=", 1)
                     self[key.strip()] = value.strip()
         
-        # 解析 acronyms_suggestions_list 配置
-        acronyms_suggestions_list = flow_settings.get("acronyms_suggestions_list") if "acronyms_suggestions_list" in flow_settings else None
-        if acronyms_suggestions_list:
-            self["acronyms_suggestions_list"] = [s.strip() for s in acronyms_suggestions_list.split("\n") if s.strip()]
+        # 解析 suggestions_list 配置（每行一个程序名称）
+        suggestions_list = flow_settings.get("suggestions_list") if "suggestions_list" in flow_settings else None
+        if suggestions_list:
+            self["suggestions_list"] = [s.strip().upper() for s in suggestions_list.split("\n") if s.strip()]
         
 
         # 解析 acronyms_map 配置
-        acronyms_map = flow_settings.get("custom_acronyms_map") if "custom_acronyms_map" in flow_settings else None
-        if acronyms_map:
+        custom_acronyms_map = flow_settings.get("custom_acronyms_map") if "custom_acronyms_map" in flow_settings else None
+        if custom_acronyms_map:
             self["custom_acronyms_map"] = {}
-            for line in acronyms_map.split("\n"):
+            for line in custom_acronyms_map.split("\n"):
                 line = line.strip()
                 if line and "=" in line:
-                    prog, acr = line.split("=", 1)
-                    prog = prog.strip().upper()
-                    acr = acr.strip()
-                    self["custom_acronyms_map"][prog] = acr
+                    program, acronyms = line.split("=", 1)
+                    program = program.strip().upper()
+                    acronyms = acronyms.strip()
+                    self["custom_acronyms_map"][program] = acronyms
 
         # 解析其他配置
         for key, value in flow_settings.items():
-            if key not in self and key not in ("acronyms_suggestions_list", "program_path", "custom_acronyms_map"):
+            if key not in self and key not in ("suggestions_list", "program_path", "custom_acronyms_map"):
                 self[key] = value
 
 

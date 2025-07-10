@@ -37,56 +37,57 @@ class ConcreteFactory(AbstractFactory):
     @classmethod
     def get_application_acronyms(cls, plugin_config) -> Dict[str, str]:
         """
-        获取应用的缩写字典，优先使用用户自定义的 acronyms_map
+        获取应用的缩写字典，优先使用 plugin_config 中用户自定义的 custom_acronyms_map。
         返回格式:
         {
             "vsc": "VSCODE",
-            "idea": "IDEA",
+            "cs": "CURSOR",
             ...
         }
         """
         ApplicationRegistry.load_applications()
-        default_acronyms_map = ApplicationRegistry.get_acronyms_map()
-        custom_acronyms_map = plugin_config.get("custom_acronyms_map", None)
-        if custom_acronyms_map:
-            # acronyms_map: {"VSCODE": "vsc"}
-            # 只合并支持的程序名
-            supported_programs = set(default_acronyms_map.values())
-            for prog, acr in custom_acronyms_map.items():
-                if prog in supported_programs:
-                    default_acronyms_map[acr] = prog
-        return default_acronyms_map
+        default_acronyms_map = ApplicationRegistry.get_acronyms_map()  
+        custom_acronyms_map = plugin_config.get("custom_acronyms_map", {})
+        acronyms_map = {acr: prog.upper() for prog, acr in custom_acronyms_map.items()}
+        for acr, prog in default_acronyms_map.items():
+            if prog not in acronyms_map.values():
+                acronyms_map[acr] = prog
+        return acronyms_map
 
     @classmethod
     def get_application_message(cls, plugin_config):
         """
-        根据传入的 acronyms_suggestions_list 生成 Flow Launcher 消消息列表。
-        如果未传入，则只展示用户已配置路径的应用。
+        根据配置的 suggestions_list 生成 Flow Launcher 消息列表。
+        如果未配置，则只展示用户已配置路径的应用。
         """
-        custom_acronyms_map = plugin_config.get("custom_acronyms_map", None)
-        acronyms_suggestions_list = plugin_config.get("acronyms_suggestions_list", None)
+        suggestions_list = plugin_config.get("suggestions_list", None)
         plugin_trigger_keyword = plugin_config.get("plugin_trigger_keyword", "r")
-        acronyms_dict = cls.get_application_acronyms(custom_acronyms_map)
-        logger.debug(acronyms_suggestions_list)
+        acronyms_dict = cls.get_application_acronyms(plugin_config)
+        reverse_acronyms_dict = {v: k for k, v in acronyms_dict.items()}
+        
         # 只显示已配置的应用建议
-        if acronyms_suggestions_list is None:
-            acronyms_suggestions_list = []
-            for acr, app_name in acronyms_dict.items():
-                download_key = app_name + "_DOWNLOAD"
-                storage_key = app_name + "_STORAGE"
+        if suggestions_list is None:
+            suggestions_list = []
+            for _, program_name in acronyms_dict.items():
+                download_key = program_name + "_DOWNLOAD"
+                storage_key = program_name + "_STORAGE"
                 if download_key in plugin_config and storage_key in plugin_config:
-                    acronyms_suggestions_list.append(acr)
-        return [
-            {
-                "title": acronyms_dict.get(acronyms),
-                "subTitle": acronyms,
-                "icoPath": f"icons/{acronyms_dict.get(acronyms)}.png",
-                "jsonRPCAction": {
-                    "method": "Flow.Launcher.ChangeQuery",
-                    "parameters": [f"{plugin_trigger_keyword} {acronyms} ", False],
-                    "dontHideAfterAction": True,
-                },
-                "score": 0,
-            }
-            for acronyms in acronyms_suggestions_list
-        ]
+                    suggestions_list.append(program_name)
+                    
+        messages = []
+        for idx, program_name in enumerate(suggestions_list):
+            if program_name in reverse_acronyms_dict:
+                acronyms = reverse_acronyms_dict[program_name]
+                messages.append({
+                    "title": program_name,
+                    "subTitle": acronyms,
+                    "icoPath": f"icons/{program_name}.png",
+                    "jsonRPCAction": {
+                        "method": "Flow.Launcher.ChangeQuery",
+                        "parameters": [f"{plugin_trigger_keyword} {acronyms} ", False],
+                        "dontHideAfterAction": True,
+                    },
+                    # 按原始顺序排序
+                    "score": (100 - idx) * 10000,
+                })
+        return messages

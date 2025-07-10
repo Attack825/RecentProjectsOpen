@@ -71,24 +71,36 @@ All configurations can be done in the Settings Panel. Change the configurations 
   TYPORA_STORAGE=C:/Users/YourUsername/AppData/Roaming/Typora/history.data
   ```
 
-### Acronyms Suggestions List
+### Suggestions List
 
-- You can customize the acronyms suggestions list displayed when no input is provided.
-- Configure acronyms suggestions list in the following format:
+- You can customize the program suggestions list displayed when no input is provided.
+- Configure program suggestions list in the following format:
 
   ```plaintext
-  vsc
-  py
-  cl
-  # ... other acronyms
+  VSCODE
+  PYCHARM
+  INTELLIJ_IDEA
+  # ... other programs
   ```
 
-- Keep empty to display the default acronyms suggestions list — the plugin will suggest the programs that are configured in the [Program Path](#program-path).
+- Keep empty to display the default program suggestions list — the plugin will suggest the programs that are configured in the [Program Path](#program-path).
 
 ### Plugin Trigger Keyword
 
 - Make sure to update this configuration  when you change the trigger keyword of this plugin.
-- It affects the usage of [Acronyms Suggestions List](#acronyms-suggestions-list).
+- It affects the usage of [Suggestions List](#suggestions-list).
+
+### Custom Acronyms Map
+
+- Configure custom acronyms for your programs in the following format:
+
+  ```plaintext
+  VSCODE=vs
+  PYCHARM=pc
+  # ... other acronyms map
+  ```
+
+- This allows you to use custom acronyms when the [default acronyms](#supported-programs) do not match your preferences.
 
 ### Tips
 
