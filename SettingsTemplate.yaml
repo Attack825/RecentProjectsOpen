@@ -25,5 +25,14 @@ body:
         Each acronym should be defined on a new line.
 
         Keep empty to display the default program suggestions.
+  - type: input
+    attributes:
+      name: plugin_keyword
+      label: Plugin Keyword
+      description: >
+        The keyword to trigger the plugin.
+
+        If you change it, please update here as well.
+      defaultValue: "r"
 
 

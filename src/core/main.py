@@ -25,10 +25,10 @@ class RecentProjectsOpen(FlowLauncher):
 
         # 如果没有输入参数，则根据 acronyms_list 展示建议列表
         if len(args) == 0:
+            plugin_keyword = config.get("plugin_keyword") if "plugin_keyword" in config else "r"
             acronyms_list = config.get("acronyms_list") if "acronyms_list" in config else None
-            logger.debug(f"acronyms_list: {acronyms_list}")
-            return ConcreteFactory.get_application_message(acronyms_list)
-        
+            return ConcreteFactory.get_application_message(plugin_keyword, acronyms_list)
+
         acronyms = args.split(" ")[0]
 
         if acronyms not in acronyms_dict.keys():
@@ -38,7 +38,6 @@ class RecentProjectsOpen(FlowLauncher):
             )
         else:
             app_name = acronyms_dict[acronyms]
-            logger.debug(f"app_name: {app_name}")
         icon_path = "icons/{}_icon.png".format(acronyms)
         query = "".join(args.split(" ")[1:])
 

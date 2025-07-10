@@ -46,7 +46,7 @@ class ConcreteFactory(AbstractFactory):
         return ApplicationRegistry.get_acronyms_map()
 
     @classmethod
-    def get_application_message(cls, acronyms_list):
+    def get_application_message(cls, plugin_keyword, acronyms_list):
         """
         根据传入的 acronyms_list 生成 Flow Launcher 消息列表。
         如果未传入，则只展示用户已配置路径的应用。
@@ -69,7 +69,7 @@ class ConcreteFactory(AbstractFactory):
                 "icoPath": f"icons/{acronyms}_icon.png",
                 "jsonRPCAction": {
                     "method": "Flow.Launcher.ChangeQuery",
-                    "parameters": [f"r {acronyms} ", False],
+                    "parameters": [f"{plugin_keyword} {acronyms} ", False],
                     "dontHideAfterAction": True,
                 },
                 "score": 0,
