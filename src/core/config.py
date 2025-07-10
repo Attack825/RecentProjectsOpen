@@ -26,13 +26,13 @@ class Config(dict):
                 if line and "=" in line:
                     key, value = line.split("=", 1)
                     self[key.strip()] = value.strip()
-        # 解析 acronyms_list 配置
-        acronyms_list = flow_settings.get("acronyms_list") if "acronyms_list" in flow_settings else None
-        if acronyms_list:
-            self["acronyms_list"] = [s.strip() for s in acronyms_list.split("\n") if s.strip()]
+        # 解析 acronyms_suggestions_list 配置
+        acronyms_suggestions_list = flow_settings.get("acronyms_suggestions_list") if "acronyms_suggestions_list" in flow_settings else None
+        if acronyms_suggestions_list:
+            self["acronyms_suggestions_list"] = [s.strip() for s in acronyms_suggestions_list.split("\n") if s.strip()]
         # 解析其他配置
         for key, value in flow_settings.items():
-            if key not in self and key not in ("acronyms_list", "program_path"):
+            if key not in self and key not in ("acronyms_suggestions_list", "program_path"):
                 self[key] = value
 
     def get(self, key: str) -> str:

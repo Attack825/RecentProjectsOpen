@@ -15,20 +15,20 @@ body:
       defaultValue: ""
   - type: textarea
     attributes:
-      name: acronyms_list
-      label: Acronyms List
+      name: acronyms_suggestions_list
+      label: Acronyms Suggestions List
       description: >
-        Configure the list of acronyms.
-        
+        Configure the list of acronyms suggestions.
+
         It will be displayed when the plugin is activated.
 
         Each acronym should be defined on a new line.
 
-        Keep empty to display the default program suggestions.
+        Keep empty to display the default acronyms suggestions.
   - type: input
     attributes:
-      name: plugin_keyword
-      label: Plugin Keyword
+      name: plugin_trigger_keyword
+      label: Plugin Trigger Keyword
       description: >
         The keyword to trigger the plugin.
 

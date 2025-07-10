@@ -46,22 +46,22 @@ class ConcreteFactory(AbstractFactory):
         return ApplicationRegistry.get_acronyms_map()
 
     @classmethod
-    def get_application_message(cls, plugin_keyword, acronyms_list):
+    def get_application_message(cls, plugin_trigger_keyword, acronyms_suggestions_list):
         """
-        根据传入的 acronyms_list 生成 Flow Launcher 消息列表。
+        根据传入的 acronyms_suggestions_list 生成 Flow Launcher 消息列表。
         如果未传入，则只展示用户已配置路径的应用。
         """
         from src.core.config import config
 
         acronyms_dict = cls.get_application_acronyms()
-        if acronyms_list is None:
-            acronyms_list = []
+        if acronyms_suggestions_list is None:
+            acronyms_suggestions_list = []
             # 遍历所有应用的缩写，检查用户配置
             for acr, app_name in acronyms_dict.items():
                 download_key = app_name + "_DOWNLOAD"
                 storage_key = app_name + "_STORAGE"
                 if download_key in config and storage_key in config:
-                    acronyms_list.append(acr)
+                    acronyms_suggestions_list.append(acr)
         return [
             {
                 "title": acronyms_dict.get(acronyms, acronyms),
@@ -69,10 +69,10 @@ class ConcreteFactory(AbstractFactory):
                 "icoPath": f"icons/{acronyms}_icon.png",
                 "jsonRPCAction": {
                     "method": "Flow.Launcher.ChangeQuery",
-                    "parameters": [f"{plugin_keyword} {acronyms} ", False],
+                    "parameters": [f"{plugin_trigger_keyword} {acronyms} ", False],
                     "dontHideAfterAction": True,
                 },
                 "score": 0,
             }
-            for acronyms in acronyms_list
+            for acronyms in acronyms_suggestions_list
         ]

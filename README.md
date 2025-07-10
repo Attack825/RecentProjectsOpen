@@ -6,7 +6,7 @@ A plugin that enables quick access to recent projects across various IDEs like V
 
 Download from the store
 
-## Supported applications
+## Supported programs
 
 - [x] visual studio code
 - [x] pycharm
@@ -20,9 +20,9 @@ Download from the store
 - [x] vscode ssh
 - [x] typora
 
-You can access different IDEs using the following format:
+You can access different programs using the following acronyms:
 
-```python
+```json
 {
     "vsc": "VSCODE",
     "py": "PYCHARM",
@@ -44,14 +44,14 @@ All configurations can be done in the Settings Panel. Change the configurations 
 
 ### Program Path
 
-- Configure application paths in the following format:
+- Configure program paths in the following format:
 
   ```plaintext
   APP_DOWNLOAD=C:/path/to/app.exe
   APP_STORAGE=C:/path/to/storage/file
   ```
 
-- Each application needs both DOWNLOAD and STORAGE entries
+- Each program needs both DOWNLOAD and STORAGE entries
 - Example configuration:
 
   ```plaintext
@@ -71,6 +71,25 @@ All configurations can be done in the Settings Panel. Change the configurations 
   TYPORA_STORAGE=C:/Users/YourUsername/AppData/Roaming/Typora/history.data
   ```
 
+### Acronyms Suggestions List
+
+- You can customize the acronyms suggestions list displayed when no input is provided.
+- Configure acronyms suggestions list in the following format:
+
+  ```plaintext
+  vsc
+  py
+  cl
+  # ... other acronyms
+  ```
+
+- Keep empty to display the default acronyms suggestions list — the plugin will suggest the programs that are configured in the [Program Path](#program-path).
+
+### Plugin Trigger Keyword
+
+- Make sure to update this configuration  when you change the trigger keyword of this plugin.
+- It affects the usage of [Acronyms Suggestions List](#acronyms-suggestions-list).
+
 ### Tips
 
 - **Verify Paths**: Ensure that the paths you enter are correct and that the files or executables exist at those locations
@@ -81,23 +100,23 @@ All configurations can be done in the Settings Panel. Change the configurations 
 
 To open a project named "MyProject" in Visual Studio Code, you would use:
 
-r
+`r`
 
 ![1752128883045](image/README/1752128883045.png)
 
-r vsc
+`r vsc`
 
 ![1733284352742](image/README/1733284352742.png)
 
-r vsc My
+`r vsc My`
 
 ![1733284374591](image/README/1733284374591.png)
 
-r vsc 空
+`r vsc 空`
 
 ![1733284760505](image/README/1733284760505.png)
 
-context menu
+`context menu`
 
 ![1742873448581](image/README/1742873448581.png)
 

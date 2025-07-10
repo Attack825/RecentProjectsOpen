@@ -23,11 +23,11 @@ class RecentProjectsOpen(FlowLauncher):
         args = param.strip()
         acronyms_dict = ConcreteFactory.get_application_acronyms()
 
-        # 如果没有输入参数，则根据 acronyms_list 展示建议列表
+        # 如果没有输入参数，则根据 acronyms_suggestions_list 展示建议列表
         if len(args) == 0:
-            plugin_keyword = config.get("plugin_keyword") if "plugin_keyword" in config else "r"
-            acronyms_list = config.get("acronyms_list") if "acronyms_list" in config else None
-            return ConcreteFactory.get_application_message(plugin_keyword, acronyms_list)
+            plugin_trigger_keyword = config.get("plugin_trigger_keyword") if "plugin_trigger_keyword" in config else "r"
+            acronyms_suggestions_list = config.get("acronyms_suggestions_list") if "acronyms_suggestions_list" in config else None
+            return ConcreteFactory.get_application_message(plugin_trigger_keyword, acronyms_suggestions_list)
 
         acronyms = args.split(" ")[0]
 
