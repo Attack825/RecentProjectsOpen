@@ -49,11 +49,19 @@ class ConcreteFactory(AbstractFactory):
     def get_application_message(cls, acronyms_list):
         """
         根据传入的 acronyms_list 生成 Flow Launcher 消息列表。
-        如果未传入，则展示所有支持的应用。
+        如果未传入，则只展示用户已配置路径的应用。
         """
+        from src.core.config import config
+
         acronyms_dict = cls.get_application_acronyms()
         if acronyms_list is None:
-            acronyms_list = list(acronyms_dict.keys())
+            acronyms_list = []
+            # 遍历所有应用的缩写，检查用户配置
+            for acr, app_name in acronyms_dict.items():
+                download_key = app_name + "_DOWNLOAD"
+                storage_key = app_name + "_STORAGE"
+                if download_key in config and storage_key in config:
+                    acronyms_list.append(acr)
         return [
             {
                 "title": acronyms_dict.get(acronyms, acronyms),
