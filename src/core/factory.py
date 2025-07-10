@@ -46,36 +46,25 @@ class ConcreteFactory(AbstractFactory):
         return ApplicationRegistry.get_acronyms_map()
 
     @classmethod
-    def get_application_message(cls) -> List[Dict[str, str]]:
-        """获得所有applications的消息列表
-        Returns:
-            [
-                {
-                    "title": "VSCODE",
-                    "subTitle": "vsc",
-                    "icoPath": "icons/app.png",
-                    "jsonRPCAction": {
-                        "method": "Flow.Launcher.ChangeQuery",
-                        "parameters": ["r vsc", False],
-                        "dontHideAfterAction": True,
-                    },
-                    "score": 0,
-                },
-            ]
+    def get_application_message(cls, acronyms_list):
         """
-        application_dict = ConcreteFactory.get_application_acronyms()
-        keys = list(application_dict.keys())
+        根据传入的 acronyms_list 生成 Flow Launcher 消息列表。
+        如果未传入，则展示所有支持的应用。
+        """
+        acronyms_dict = cls.get_application_acronyms()
+        if acronyms_list is None:
+            acronyms_list = list(acronyms_dict.keys())
         return [
             {
-                "title": application_dict[keys[i]],
-                "subTitle": keys[i],
-                "icoPath": f"icons/{keys[i]}_icon.png",
+                "title": acronyms_dict.get(acronyms, acronyms),
+                "subTitle": acronyms,
+                "icoPath": f"icons/{acronyms}_icon.png",
                 "jsonRPCAction": {
                     "method": "Flow.Launcher.ChangeQuery",
-                    "parameters": [f"r {keys[i]}", False],
+                    "parameters": [f"r {acronyms} ", False],
                     "dontHideAfterAction": True,
                 },
                 "score": 0,
             }
-            for i in range(len(keys))
+            for acronyms in acronyms_list
         ]

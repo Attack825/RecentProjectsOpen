@@ -13,3 +13,17 @@ body:
 
         Each application needs both DOWNLOAD and STORAGE entries.
       defaultValue: ""
+  - type: textarea
+    attributes:
+      name: acronyms_list
+      label: Acronyms List
+      description: >
+        Configure the list of acronyms.
+        
+        It will be displayed when the plugin is activated.
+
+        Each acronym should be defined on a new line.
+
+        Keep empty to display the default program suggestions.
+
+

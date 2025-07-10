@@ -23,9 +23,12 @@ class RecentProjectsOpen(FlowLauncher):
         args = param.strip()
         acronyms_dict = ConcreteFactory.get_application_acronyms()
 
-        # 遍历显示
+        # 如果没有输入参数，则根据 acronyms_list 展示建议列表
         if len(args) == 0:
-            return ConcreteFactory.get_application_message()
+            acronyms_list = config.get("acronyms_list") if "acronyms_list" in config else None
+            logger.debug(f"acronyms_list: {acronyms_list}")
+            return ConcreteFactory.get_application_message(acronyms_list)
+        
         acronyms = args.split(" ")[0]
 
         if acronyms not in acronyms_dict.keys():
@@ -48,7 +51,7 @@ class RecentProjectsOpen(FlowLauncher):
                 "{0} app_download or app_storage is None".format(app_name) + str(e),
                 "Please check your settings",
             )
-        logger.debug(f"app_download: {app_download}, app_storage: {app_storage}")
+        
         # 读取recent_projects
         try:
             app = ConcreteFactory.create_app(app_name, app_download, app_storage)
