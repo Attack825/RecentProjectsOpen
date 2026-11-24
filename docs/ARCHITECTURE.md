@@ -45,7 +45,7 @@
 | 模糊匹配 | `difflib.SequenceMatcher`（标准库） | 前缀 / 子串 / 相似度 0.9，无第三方依赖 |
 | 拼音 | `pypinyin` | 中文项目名支持拼音检索 |
 | 配置 UI | `SettingsTemplate.yaml` | Flow Launcher Settings Panel 的 schema |
-| 质量保障 | `ruff`（format+check）、`pre-commit`、`unittest` | 见 [.pre-commit-config.yaml](../.pre-commit-config.yaml) |
+| 质量保障 | `ruff`（format+check）、`mypy`、`pre-commit`、`unittest` | 见 [.pre-commit-config.yaml](../.pre-commit-config.yaml) 与 [mypy.ini](../mypy.ini) |
 | 打包 | GitHub Actions（windows-latest）→ zip | 只装 `requirements.txt`（纯 Python），发布前跑产物冒烟测试 |
 
 运行时目录约定的关键点：`main.py` 会把**项目根目录**、**根目录/lib**、**根目录/src** 三个路径塞进 `sys.path`，
@@ -346,9 +346,10 @@ classDiagram
 | 方法 | 职责 |
 | --- | --- |
 | `query(param)` | 解析 `acronym + query`，读配置、建应用实例、取项目、过滤，最后交给 `MessageDTO` |
-| `context_menu(data)` | 校验 `ContextData`（`[exe, path]`）后返回"复制路径 / 资源管理器打开 / 仓库链接"三项 |
+| `context_menu(data)` | 解析 `ContextData`（1.4.0 起为 `{command, path}`，兼容旧命令数组），返回"复制路径 / 资源管理器打开 / 仓库链接"。路径存在才给 explorer 项 |
 | `cmd_command(*args)` | `subprocess.Popen(args, shell=True)` 启动 IDE，stdout/stderr 均丢弃 |
-| `copy_to_clipboard(text)` | `echo text \| clip`（技术债，见 13.2） |
+| `copy_to_clipboard(text)` | 调用 [`src/core/clipboard.py`](../src/core/clipboard.py) 的 Win32 剪贴板 API |
+| `open_in_explorer(path)` | `os.startfile`（目录直接打开，文件打开所在目录），不经过 shell |
 | `open_url(url)` | `webbrowser.open` |
 
 ### 6.2 [`src/core/config.py`](../src/core/config.py)：配置单例
@@ -367,15 +368,12 @@ classDiagram
 - `load_applications()` 扫描 `src/application/*.py` 动态 import，新增文件无需登记
 - `_loaded` 标记设置了但从未读取（见 13.1-6）
 
-### 6.4 [`src/core/factory.py`](../src/core/factory.py)：工厂 + 缩写 + 建议
+### 6.4 [`src/core/factory.py`](../src/core/factory.py)：工厂
 
-`ConcreteFactory` 目前承担三件事（13.2 已标注职责过多）：
+1.4.0 起工厂只负责实例化，缩写与建议拆成独立服务（见 6.10 / 6.11）：
 
-1. `create_app(name, download, storage)`：查注册表并实例化
-2. `get_application_acronyms(config)`：默认缩写表与用户自定义合并，**用户自定义优先**；
-   默认项只在缩写未被占用时补入
-3. `get_application_message(config)`：生成空查询时的建议项，`score = (100 - idx) * 10000` 保序，
-   点击后发 `Flow.Launcher.ChangeQuery` 把输入补全成 `r <acronym> `
+- `ConcreteFactory.create_app(name, download, storage)`：查注册表并实例化
+- `ConcreteFactory.get_supported_applications()`：已注册应用列表
 
 ### 6.5 [`src/core/filter.py`](../src/core/filter.py)：检索策略
 
@@ -578,8 +576,8 @@ class Zed(BaseApplication):
 
 ### 12.1 测试
 
-8 个 `unittest` 模块，40 个用例，覆盖：配置解析、DTO、Project/Filter、JetBrains、VSCode、Sumatra、Typora，
-以及新增的 filter 单测与 JSON-RPC 通道回归测试（stderr 必须为空、stdout 必须是 JSON）。
+9 个 `unittest` 模块，58 个用例，覆盖：配置解析、DTO、Project/Filter、JetBrains、VSCode、Sumatra、Typora，
+以及 JSON-RPC 通道（stderr 必须为空、stdout 必须是 JSON）、剪贴板、右键菜单、naming 约定与两个服务。
 
 ```bash
 python -m unittest discover -s test -p "test_*.py"
@@ -588,7 +586,7 @@ python -m unittest discover -s test -p "test_*.py"
 - 全部用**真实样本文本**驱动（`test/mock_data/`），没有 mock 文件 IO —— 好处是能验证真实格式，
   代价是样本必须脱敏后长期维护。
 - `test_config.py` 用 `@patch("src.core.config.settings")` 拦截宿主 settings，是唯一 mock 边界。
-- 本地实测：CPython 3.9.13 / 3.11.1 / 3.13.5 下 40 个用例全部通过。
+- 本地实测：CPython 3.9.13 / 3.11.1 / 3.13.5 下 58 个用例全部通过。
 
 ### 12.2 格式化
 
@@ -598,7 +596,7 @@ python -m unittest discover -s test -p "test_*.py"
 
 | 工作流 | 触发 | 动作 |
 | --- | --- | --- |
-| [`ci.yml`](../.github/workflows/ci.yml) | push/PR 到 main | `windows-latest` × py3.9/3.11/3.13 跑单测；`ubuntu-latest` 跑 pre-commit |
+| [`ci.yml`](../.github/workflows/ci.yml) | push/PR 到 main | `windows-latest` × py3.9/3.11/3.13 跑单测；`ubuntu-latest` 跑 pre-commit + mypy |
 | [`Publish Release.yml`](../.github/workflows/Publish%20Release.yml) | 推 `v*` tag 或手动 | Windows 构建 → 只装运行时依赖到 `lib/` → 打 zip → 3.9/3.11/3.13 冒烟 → 发 GitHub Release |
 
 发版包内依赖在 `lib/`，正好对应 `main.py` 里 `sys.path.append(.../lib)` 的设计，
@@ -617,23 +615,21 @@ python -m unittest discover -s test -p "test_*.py"
 | 3 | [`src/core/filter.py`](../src/core/filter.py) | `process.extractOne(query_pinyin, project_name_pinyin)` 第二参是**字符串而非列表**，按字符迭代；且阈值 `> 90` 永不命中 | 已修复（1.3.1：改用 difflib，新增子串匹配与单测） |
 | 4 | `vscode.py` / `vscode_ssh.py` | `profileAssociations.get("workspaces")` 假设父键存在；storage.json 缺该键时抛 `AttributeError` | 待修复 |
 | 5 | README vs 代码 | README 缩写表写 `SUMATRA_PDF`，代码注册键为 `SUMATRA` | 已修复（1.3.1：README 改为 `SUMATRA`） |
-| 6 | [`src/core/registry.py`](../src/core/registry.py) | `cls._loaded = True` 设置了但从未读取 | 待修复 |
+| 6 | [`src/core/registry.py`](../src/core/registry.py) | `cls._loaded = True` 设置了但从未读取（1.4.0 仅为 mypy 补了 `ClassVar` 声明，仍是死字段） | 待修复 |
 | 7 | [`.pre-commit-config.yaml`](../.pre-commit-config.yaml) | `exclude: tests/`，但仓库目录叫 `test/` —— 排除规则从未命中 | 已修复（1.3.1：移除该配置） |
 | 8 | `vscode.py` | `folder_url[0].upper()` 假设首字符一定是盘符；UNC / WSL 路径会得到错误结果 | 待修复 |
 
-### 13.2 设计层面的不足
+### 13.2 设计层面的不足（1.4.0 处置结果）
 
-- **错误处理不统一**：JetBrains 抛 `FileNotFoundError`，Sumatra / Typora 内部吞异常返回 `[]`。
-  同一个「文件不存在」场景，用户看到两种反馈（warn vs 空列表）。
-- **无统一排序抽象**：Typora 显式按时间排序，VSCode 靠倒序遍历 JSON key，JetBrains 完全依赖 XML 顺序。
-  「最近使用」的语义在不同适配器间并不一致。
-- **`ConcreteFactory` 职责过多**：实例化 + 缩写合并 + UI 消息生成三合一，已偏离「工厂」本意，
-  可拆成 `AcronymService` 与 `SuggestionService`。
-- **字符串约定隐形**：`<NAME>_DOWNLOAD` / `<NAME>_STORAGE`、`icons/<NAME>.png` 都靠命名约定耦合，
-  既无类型也无启动期校验；建议在 `BaseApplication` 上声明键名或在厂商类里加 `validate_config()` 自检。
-- **`context_menu` 的路径判定用正则**：不如直接 `os.path.isabs` + 规范化，且带空格的中文路径会失效。
-- **`copy_to_clipboard` 用 shell 管道**：`echo` 对引号、`&`、`|` 等字符不安全，应改为把文本写进 `clip` 的 stdin。
-- **无类型检查基线**：有 `TypedDict` 但未接 mypy / pyright；`Config.get` 的 `-> str` 注解与实际返回不符。
+| 项 | 处置 |
+| --- | --- |
+| 错误处理不统一 | ✅ 已修复：统一抛 `StorageFileNotFound`，main 转 warn 项（见 15.1） |
+| 无统一排序抽象 | ⏸ **决定不做**：三类数据源的时间语义不一致（Typora 有时间戳、VSCode 只有 key 顺序、JetBrains 依赖 XML 顺序），强行统一会引入更难验证的排序回归；差异保留在 8.2 的应用矩阵说明中 |
+| `ConcreteFactory` 职责过多 | ✅ 已拆分：`AcronymService` / `SuggestionService`（见 15.2） |
+| 字符串约定隐形 | ✅ 已收敛：`naming.py` + `BaseApplication.validate_storage`（见 15.3） |
+| `context_menu` 用正则 | ✅ 已修复：结构化 `ContextData` + `os.path` 判定 + `os.startfile`（见 15.4） |
+| `copy_to_clipboard` 用 shell 管道 | ✅ 已修复：Win32 剪贴板 API（见 15.5） |
+| 无类型检查基线 | ✅ 已接入：mypy 1.13 basic + CI 门禁（见 15.6） |
 
 ---
 
@@ -664,3 +660,47 @@ python tools/smoke_test.py RecentProjectsOpen.zip --python python
 # 本地模拟发布（Windows）
 pip install -r requirements.txt -t ./lib
 ```
+
+---
+
+## 15. 1.4.0 架构变更
+
+### 15.1 统一错误模型
+
+- 新增 [`src/core/errors.py`](../src/core/errors.py)：`StorageFileNotFound(FileNotFoundError)`，带 `app_name` / `path`
+- JetBrains / VSCode / VSCode SSH / Sumatra / Typora 全部改抛该异常，不再有"吞异常返回 `[]`"的分支
+- `main.query` 捕获后统一转成 warn 项，Title 中包含应用名与具体路径
+
+### 15.2 服务拆分
+
+- [`src/core/acronyms.py`](../src/core/acronyms.py)：`AcronymService.get_map`（默认 + 自定义，自定义优先）
+- [`src/core/suggestions.py`](../src/core/suggestions.py)：`SuggestionService.build`（ChangeQuery / 顺序 / score）
+- `ConcreteFactory` 只保留 `create_app` 与 `get_supported_applications`
+
+### 15.3 命名约定收敛
+
+- [`src/core/naming.py`](../src/core/naming.py)：`download_key` / `storage_key` / `config_keys` / `icon_path`
+- `BaseApplication.validate_storage()`：存储文件不存在时抛 `StorageFileNotFound`
+- `BaseApplication.icon_path` 改为只读属性，跟随 `self.name`
+
+### 15.4 ContextData 契约
+
+- `MessageDTO` 发送 `{"command": [...], "path": "..."}`，`jsonRPCAction.parameters` 仍是可直接执行的命令数组
+- `context_menu` 兼容旧的命令数组（取最后一项作为路径），并用 `os.path.normpath` / `os.path.exists` 判定
+- "Open in explorer" 改走 `os.startfile`，路径含空格/中文不再被 shell 拆分
+
+### 15.5 剪贴板
+
+- [`src/core/clipboard.py`](../src/core/clipboard.py)：`OpenClipboard` + `SetClipboardData(CF_UNICODETEXT)`，
+  UTF-16LE 写入，带占用重试；`read_text` 供测试与诊断
+
+### 15.6 类型基线
+
+- [`mypy.ini`](../mypy.ini)：`python_version=3.9`、`platform=win32`、`files=src,tools`、
+  `ignore_missing_imports`、`check_untyped_defs`
+- CI 的 lint job 在 pre-commit 之后执行 `mypy`；当前基线 30 个源文件 0 错误
+
+### 15.7 未做项
+
+- **统一排序抽象**（见 13.2）：语义不确定、回归难验证，明确不做；如果未来要做，
+  应从"给 `Project` 增加可选 `last_used`，有则稳定排序、无则保持原序"开始，并单独立项。
