@@ -51,6 +51,28 @@ class JsonRpcChannelTest(unittest.TestCase):
         payload = json.loads(proc.stdout)
         self.assertGreaterEqual(len(payload["result"]), 1)
 
+    def test_missing_config_returns_warning_instead_of_crashing(self):
+        """缺少 STORAGE 配置时应返回提示项，而不是 stderr 上抛 TypeError"""
+        request = json.dumps(
+            {
+                "method": "query",
+                "parameters": ["idea"],
+                "settings": {"program_path": "INTELLIJ_IDEA_DOWNLOAD=C:/fake/idea64.exe"},
+            }
+        )
+        proc = subprocess.run(
+            [sys.executable, os.path.join(ROOT, "main.py"), request],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=120,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(proc.stderr, "")
+        payload = json.loads(proc.stdout)
+        self.assertIn("app_download or app_storage is None", payload["result"][0]["Title"])
+
     def test_stderr_stays_empty_even_with_warnings_enabled(self):
         proc = self._run("idea", {"PYTHONWARNINGS": "always"})
         self.assertEqual(proc.returncode, 0, proc.stderr)

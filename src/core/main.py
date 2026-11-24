@@ -1,7 +1,6 @@
 import subprocess
 import webbrowser
 
-from click import UsageError
 from flowlauncher import FlowLauncher
 
 from src.core.config import config
@@ -38,13 +37,12 @@ class RecentProjectsOpen(FlowLauncher):
         icon_path = f"icons/{app_name}.png"
         query = "".join(args.split(" ")[1:])
 
-        # 读取配置
-        try:
-            app_download = config.get(app_name + "_DOWNLOAD")
-            app_storage = config.get(app_name + "_STORAGE")
-        except UsageError as e:
+        # 读取配置：缺少任一配置时返回提示，而不是让 None 传进 os.path 后抛异常
+        app_download = config.get(app_name + "_DOWNLOAD")
+        app_storage = config.get(app_name + "_STORAGE")
+        if not app_download or not app_storage:
             return MessageDTO.asWarnFlowMessage(
-                f"{app_name} app_download or app_storage is None" + str(e),
+                f"{app_name} app_download or app_storage is None",
                 "Please check your settings",
             )
 
