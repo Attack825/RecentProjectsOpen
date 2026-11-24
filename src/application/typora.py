@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from typing import List
 
 from ..core.logger import get_logger
 from ..core.project import Project
@@ -17,12 +16,12 @@ class Typora(BaseApplication):
         self.name = "TYPORA"
         self.acronyms = "ty"
 
-    def get_projects(self) -> List[Project]:
+    def get_projects(self) -> list[Project]:
         """获取Typora最近打开的项目"""
         projects = []
 
         try:
-            with open(self.storage_file, "r", encoding="utf-8") as file:
+            with open(self.storage_file, encoding="utf-8") as file:
                 settings_content = file.read()
         except FileNotFoundError:
             print(f"Settings file not found: {self.storage_file}")

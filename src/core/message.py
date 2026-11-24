@@ -1,5 +1,3 @@
-from typing import List
-
 from .logger import get_logger
 from .project import Project
 
@@ -11,8 +9,8 @@ class MessageDTO:
 
     @staticmethod
     def asMultiFlowMessage(
-        projects: List[Project], icopath, method: str, app_download: str
-    ) -> List:
+        projects: list[Project], icopath, method: str, app_download: str
+    ) -> list:
         message_list = []
 
         titles = [project.name for project in projects]
@@ -39,7 +37,7 @@ class MessageDTO:
         return message_list
 
     @staticmethod
-    def asWarnFlowMessage(title, subTitle) -> List:
+    def asWarnFlowMessage(title, subTitle) -> list:
         return [
             {
                 "Title": title,
@@ -49,7 +47,7 @@ class MessageDTO:
         ]
 
     @staticmethod
-    def asDebugFlowMessage(msg) -> List:
+    def asDebugFlowMessage(msg) -> list:
         return [
             {
                 "Title": msg,

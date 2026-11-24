@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Dict
 
 from .logger import get_logger
 from .registry import ApplicationRegistry
@@ -35,7 +34,7 @@ class ConcreteFactory(AbstractFactory):
         return list(ApplicationRegistry.get_all_applications().keys())
 
     @classmethod
-    def get_application_acronyms(cls, plugin_config) -> Dict[str, str]:
+    def get_application_acronyms(cls, plugin_config) -> dict[str, str]:
         """
         获取应用的缩写字典，优先使用 plugin_config 中用户自定义的 custom_acronyms_map。
         返回格式:
@@ -68,7 +67,7 @@ class ConcreteFactory(AbstractFactory):
         # 只显示已配置的应用建议
         if suggestions_list is None:
             suggestions_list = []
-            for _, program_name in acronyms_dict.items():
+            for program_name in acronyms_dict.values():
                 download_key = program_name + "_DOWNLOAD"
                 storage_key = program_name + "_STORAGE"
                 if download_key in plugin_config and storage_key in plugin_config:

@@ -12,5 +12,5 @@ line-length = 88
 extend-exclude = ["docs", "lib", ".venv", "venv"]
 
 [lint]
-# 渐进式启用：本 PR 只声明当前代码已满足的基线，随后由 style 分支逐步扩大规则集。
-select = ["E4", "E7", "E9", "F", "E402"]
+# 渐进式启用：本 PR 打开可自动修复的规则组，剩余手工项由后续 PR 处理。
+select = ["E4", "E7", "E9", "F", "E402", "I", "UP", "RUF100", "SIM", "PERF102"]

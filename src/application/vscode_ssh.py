@@ -1,7 +1,6 @@
 import json
 import os
 import re
-from typing import List
 
 from ..core.project import Project
 from ..core.registry import ApplicationRegistry
@@ -16,7 +15,7 @@ class VscodeSSH(Vscode):
         self.acronyms = "vscs"
         self.remote = True
 
-    def get_projects(self) -> List[Project]:
+    def get_projects(self) -> list[Project]:
         """
         # 示例：添加 SSH 远程连接
         projects.append(
@@ -40,7 +39,7 @@ class VscodeSSH(Vscode):
                 raise FileNotFoundError("storage_file not found")
         storage_urls = []
         # 读取文件storage.json
-        with open(storage_file, "r", encoding="utf8") as f:
+        with open(storage_file, encoding="utf8") as f:
             data = json.loads(f.read())
             profileAssociations = data.get("profileAssociations")
             workspaces = profileAssociations.get("workspaces")

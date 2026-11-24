@@ -1,6 +1,5 @@
 import os
 import xml.etree.ElementTree as ElementTree
-from typing import List
 
 from ..core.logger import get_logger
 from ..core.project import Project
@@ -13,7 +12,7 @@ class Jetbrains(BaseApplication):
     def __init__(self, download_path: str, storage_file: str):
         super().__init__(download_path, storage_file)
 
-    def get_projects(self) -> List[Project]:
+    def get_projects(self) -> list[Project]:
         """获取JetBrains项目列表"""
         storage_file = self.storage_file
         if not os.path.exists(storage_file):

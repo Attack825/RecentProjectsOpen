@@ -1,5 +1,4 @@
 from ..application.base_jetbrains import Jetbrains
-
 from ..core.registry import ApplicationRegistry
 
 

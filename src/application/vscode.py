@@ -1,7 +1,6 @@
 import json
 import os
 import urllib.parse
-from typing import List
 
 from ..core.logger import get_logger
 from ..core.project import Project
@@ -18,7 +17,7 @@ class Vscode(BaseApplication):
         self.name = "VSCODE"
         self.acronyms = "vsc"
 
-    def get_projects(self) -> List[Project]:
+    def get_projects(self) -> list[Project]:
         """获取vscode最近打开项目路径"""
         storage_file = self.storage_file
         if storage_file is None:
@@ -29,7 +28,7 @@ class Vscode(BaseApplication):
                 raise FileNotFoundError("storage_file not found")
         folder_urls = []
         # 读取文件storage.json
-        with open(storage_file, "r", encoding="utf8") as f:
+        with open(storage_file, encoding="utf8") as f:
             data = json.loads(f.read())
             profileAssociations = data.get("profileAssociations")
             workspaces = profileAssociations.get("workspaces")

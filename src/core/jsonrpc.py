@@ -1,6 +1,7 @@
 import json
 import sys
-from typing import Any, Dict, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 if sys.version_info < (3, 11):
     from typing_extensions import NotRequired, TypedDict
@@ -25,6 +26,6 @@ class JsonRPCClient:
             return {"method": "query", "parameters": [""]}
 
 
-def settings() -> Dict[str, Any]:
+def settings() -> dict[str, Any]:
     """Retrieve the settings from Flow Launcher."""
     return JsonRPCClient().recieve().get("settings", {})

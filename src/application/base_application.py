@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import List
 
 from ..core.logger import get_logger
 from ..core.project import Project
@@ -22,5 +21,5 @@ class BaseApplication:
         self.projects = None
 
     @abstractmethod
-    def get_projects(self) -> List[Project]:
+    def get_projects(self) -> list[Project]:
         pass

@@ -11,7 +11,7 @@ os.makedirs(log_folder_path, exist_ok=True)
 # 一旦 stderr 非空，即使 stdout 已经输出了合法 JSON，本次查询也会被丢弃。
 # 因此插件必须保证 stderr 始终为空：先压制所有 warning，再把残余输出重定向到日志文件。
 warnings.filterwarnings("ignore")
-sys.stderr = open(
+sys.stderr = open(  # noqa: SIM115 - 必须与进程同生命周期，不能提前关闭
     os.path.join(log_folder_path, "stderr.log"), "a", buffering=1, encoding="utf-8"
 )
 

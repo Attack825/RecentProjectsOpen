@@ -1,19 +1,18 @@
 import importlib
 import os
-from typing import Dict, Type
 
 from ..application.base_application import BaseApplication
 
 
 class ApplicationRegistry:
-    _applications: Dict[str, Type[BaseApplication]] = {}
-    _acronyms_map: Dict[str, str] = {}
+    _applications: dict[str, type[BaseApplication]] = {}
+    _acronyms_map: dict[str, str] = {}
 
     @classmethod
     def register(cls, app_name: str):
         """应用注册装饰器"""
 
-        def wrapper(application_class: Type[BaseApplication]):
+        def wrapper(application_class: type[BaseApplication]):
             cls._applications[app_name] = application_class
             temp_instance = application_class("", "")
             cls._acronyms_map[temp_instance.acronyms] = app_name
@@ -56,6 +55,6 @@ class ApplicationRegistry:
         return cls._applications
 
     @classmethod
-    def get_acronyms_map(cls) -> Dict[str, str]:
+    def get_acronyms_map(cls) -> dict[str, str]:
         """获取所有应用的缩写映射"""
         return cls._acronyms_map

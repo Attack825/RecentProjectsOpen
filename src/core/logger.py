@@ -7,12 +7,9 @@ LOG_PATH = Path(__file__).parent.parent / "logs"
 
 
 def get_logger(log_path=None):
-    if not log_path:
-        log_path = LOG_PATH
-    else:
-        log_path = Path(log_path)
+    log_path = LOG_PATH if not log_path else Path(log_path)
     log_path.mkdir(parents=True, exist_ok=True)
-    logname = str(log_path.joinpath("chat_%s.log" % time.strftime("%Y_%m_%d")))
+    logname = str(log_path.joinpath("chat_{}.log".format(time.strftime("%Y_%m_%d"))))
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(

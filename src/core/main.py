@@ -1,6 +1,5 @@
 import subprocess
 import webbrowser
-from typing import Dict, List
 
 from click import UsageError
 from flowlauncher import FlowLauncher
@@ -19,7 +18,7 @@ class RecentProjectsOpen(FlowLauncher):
         super().__init__()
         self.context = {}
 
-    def query(self, param: str) -> List[Dict[str, str]]:
+    def query(self, param: str) -> list[dict[str, str]]:
         args = param.strip()
 
         # 如果没有输入参数，则根据 suggestions_list 展示建议列表
@@ -29,9 +28,9 @@ class RecentProjectsOpen(FlowLauncher):
         acronyms = args.split(" ")[0]
         acronyms_dict = ConcreteFactory.get_application_acronyms(config)
 
-        if acronyms not in acronyms_dict.keys():
+        if acronyms not in acronyms_dict:
             return MessageDTO.asWarnFlowMessage(
-                "{} is not supported".format(acronyms),
+                f"{acronyms} is not supported",
                 "Please input your software acronyms",
             )
         else:
@@ -45,7 +44,7 @@ class RecentProjectsOpen(FlowLauncher):
             app_storage = config.get(app_name + "_STORAGE")
         except UsageError as e:
             return MessageDTO.asWarnFlowMessage(
-                "{0} app_download or app_storage is None".format(app_name) + str(e),
+                f"{app_name} app_download or app_storage is None" + str(e),
                 "Please check your settings",
             )
 
