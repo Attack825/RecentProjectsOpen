@@ -7,6 +7,7 @@ PROJECT_ROOT = os.path.dirname(TEST_DIR)
 sys.path.append(PROJECT_ROOT)
 
 from src.application.base_jetbrains import Jetbrains  # noqa: E402
+from src.core.errors import StorageFileNotFound  # noqa: E402
 
 
 class TestJetbrainsApplication(unittest.TestCase):
@@ -41,10 +42,11 @@ class TestJetbrainsApplication(unittest.TestCase):
         """测试使用不存在的配置文件时的错误处理"""
         invalid_app = Jetbrains("", self.invalid_config_path)
 
-        with self.assertRaises(FileNotFoundError) as context:
+        with self.assertRaises(StorageFileNotFound) as context:
             invalid_app.get_projects()
 
-        self.assertEqual(str(context.exception), "storage_file not found")
+        self.assertEqual(context.exception.app_name, "BASE")
+        self.assertEqual(context.exception.path, self.invalid_config_path)
 
 
 if __name__ == "__main__":

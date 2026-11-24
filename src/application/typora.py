@@ -1,12 +1,10 @@
 import json
 from datetime import datetime
 
-from ..core.logger import get_logger
+from ..core.errors import StorageFileNotFound
 from ..core.project import Project
 from ..core.registry import ApplicationRegistry
 from .base_application import BaseApplication
-
-logger = get_logger()
 
 
 @ApplicationRegistry.register("TYPORA")
@@ -18,14 +16,11 @@ class Typora(BaseApplication):
 
     def get_projects(self) -> list[Project]:
         """获取Typora最近打开的项目"""
-        projects = []
-
         try:
             with open(self.storage_file, encoding="utf-8") as file:
                 settings_content = file.read()
         except FileNotFoundError:
-            logger.warning("Settings file not found: %s", self.storage_file)
-            return projects
+            raise StorageFileNotFound(self.name, self.storage_file) from None
 
         # decoding the hex string to bytes
         buffer = bytes.fromhex(settings_content)

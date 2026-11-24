@@ -7,6 +7,7 @@ PROJECT_ROOT = os.path.dirname(TEST_DIR)
 sys.path.append(PROJECT_ROOT)
 
 from src.application.sumatra import SumatraPDF  # noqa: E402
+from src.core.errors import StorageFileNotFound  # noqa: E402
 from src.core.project import Project  # noqa: E402
 
 
@@ -47,10 +48,12 @@ class TestSumatraApplication(unittest.TestCase):
             self.assertEqual(project.app_name, self.sumatra_app.name)
 
     def test_get_projects_with_invalid_file(self):
-        """测试使用不存在的配置文件时的错误处理"""
+        """配置文件不存在时应抛统一的 StorageFileNotFound，而不是静默返回空列表"""
         invalid_app = SumatraPDF("", self.invalid_config_path)
-        projects = invalid_app.get_projects()
-        self.assertEqual(len(projects), 0)
+        with self.assertRaises(StorageFileNotFound) as context:
+            invalid_app.get_projects()
+        self.assertEqual(context.exception.app_name, "SUMATRA")
+        self.assertEqual(context.exception.path, self.invalid_config_path)
 
 
 if __name__ == "__main__":

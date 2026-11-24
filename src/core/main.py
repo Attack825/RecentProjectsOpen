@@ -60,9 +60,9 @@ class RecentProjectsOpen(FlowLauncher):
             return MessageDTO.asWarnFlowMessage(
                 "this app is not supported", "Welcome to provide PR"
             )
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
             return MessageDTO.asWarnFlowMessage(
-                "app_download or app_storage is Error", "Please check your settings"
+                str(exc), "Please check the program path in settings"
             )
         return MessageDTO().asMultiFlowMessage(
             projects=res,

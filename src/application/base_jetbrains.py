@@ -1,6 +1,7 @@
 import os
 import xml.etree.ElementTree as ElementTree
 
+from ..core.errors import StorageFileNotFound
 from ..core.logger import get_logger
 from ..core.project import Project
 from .base_application import BaseApplication
@@ -16,7 +17,7 @@ class Jetbrains(BaseApplication):
         """获取JetBrains项目列表"""
         storage_file = self.storage_file
         if not os.path.exists(storage_file):
-            raise FileNotFoundError("storage_file not found")
+            raise StorageFileNotFound(self.name, storage_file)
         tree = ElementTree.parse(storage_file)
         projects = []
         for t in tree.findall(

@@ -8,6 +8,7 @@ PROJECT_ROOT = dirname(TEST_DIR)
 sys.path.append(PROJECT_ROOT)
 
 from src.application.typora import Typora  # noqa: E402
+from src.core.errors import StorageFileNotFound  # noqa: E402
 
 
 class TestTypora(unittest.TestCase):
@@ -31,13 +32,14 @@ class TestTypora(unittest.TestCase):
         self.assertEqual(first_project.path, r"C:\Users\xuwenjie\Desktop\物化生557.md")
 
     def test_get_projects_with_invalid_file(self):
-        """测试使用不存在的历史文件时的行为"""
+        """配置文件不存在时应抛统一的 StorageFileNotFound，而不是静默返回空列表"""
         invalid_typora = Typora(
             download_path="",
             storage_file=os.path.join(self.mock_data_dir, "nonexistent.data"),
         )
-        projects = invalid_typora.get_projects()
-        self.assertEqual(len(projects), 0)
+        with self.assertRaises(StorageFileNotFound) as context:
+            invalid_typora.get_projects()
+        self.assertEqual(context.exception.app_name, "TYPORA")
 
     def test_typora_initialization(self):
         """测试Typora类的初始化"""

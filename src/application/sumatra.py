@@ -1,11 +1,9 @@
 import re
 
-from ..core.logger import get_logger
+from ..core.errors import StorageFileNotFound
 from ..core.project import Project
 from ..core.registry import ApplicationRegistry
 from .base_application import BaseApplication
-
-logger = get_logger()
 
 
 @ApplicationRegistry.register("SUMATRA")
@@ -23,8 +21,7 @@ class SumatraPDF(BaseApplication):
             with open(self.storage_file, encoding="utf-8") as file:
                 settings_content = file.read()
         except FileNotFoundError:
-            logger.warning("Settings file not found: %s", self.storage_file)
-            return projects
+            raise StorageFileNotFound(self.name, self.storage_file) from None
 
         # 使用正则表达式匹配 FilePath
         file_path_pattern = re.compile(r"\s*FilePath\s*=\s*(.+)")
