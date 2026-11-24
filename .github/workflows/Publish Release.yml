@@ -32,10 +32,10 @@ jobs:
 
       - name: Get version
         id: version
-        uses: notiz-dev/github-action-json-property@release
-        with:
-          path: "plugin.json"
-          prop_path: "Version"
+        shell: pwsh
+        run: |
+          $version = (Get-Content plugin.json -Raw | ConvertFrom-Json).Version
+          "prop=$version" >> $env:GITHUB_OUTPUT
 
       - name: Stage package
         shell: pwsh
@@ -101,7 +101,7 @@ jobs:
           path: .
 
       - name: Publish
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: "RecentProjectsOpen.zip"
           tag_name: "v${{ needs.build.outputs.version }}"
