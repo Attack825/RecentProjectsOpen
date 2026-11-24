@@ -4,7 +4,12 @@ A plugin that enables quick access to recent projects across various IDEs like V
 
 ## Installation
 
-Download from the store
+Download from the store.
+
+> **Requirements:** Python 3.9 – 3.13. The release package bundles every runtime
+> dependency under `lib/` (pure Python, no compiled extensions), so no extra
+> `pip install` is needed — in particular you no longer need to install
+> `Levenshtein` to avoid the "slow pure-python SequenceMatcher" warning.
 
 ## Supported programs
 
@@ -31,7 +36,7 @@ You can access different programs using the following acronyms:
     "idea": "INTELLIJ_IDEA",
     "as": "ANDROID_STUDIO",
     "cur":"CURSOR",
-    "pdf":"SUMATRA_PDF",
+    "pdf":"SUMATRA",
     "trae":"TRAE",
     "vscs":"VSCODE_SSH",
     "ty": "TYPORA",
@@ -134,10 +139,19 @@ To open a project named "MyProject" in Visual Studio Code, you would use:
 
 ## Feature
 
-- [x] fuzzy search
+- [x] fuzzy search (prefix / substring / similarity, stdlib only)
 - [x] support pinyin
 - [x] prevent configurations from disappearing after updates
 - [x] open in file explorer and copy absolute path
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Flow shows `FlowPluginException` / `InvalidDataException` mentioning `UserWarning` or `fuzzywuzzy` | 1.3.0 shipped Linux-only compiled dependencies and the plugin wrote a warning to stderr; Flow treats any stderr byte as a failure | Upgrade to 1.3.1+ (the entry point now isolates stderr) |
+| `... app_download or app_storage is None` | `Program Path` is missing the `DOWNLOAD` or `STORAGE` key | Configure both keys for the app |
+| Query returns no results | Wrong `STORAGE` path, or the IDE has never opened a project | Use an absolute path and verify the file exists |
+| Need to inspect plugin errors | The plugin no longer writes to stderr | Check `logs/stderr.log` and `logs/chat_*.log` in the plugin folder |
 
 ## Contribute
 
@@ -153,8 +167,8 @@ To open a project named "MyProject" in Visual Studio Code, you would use:
    # or
    .\venv\Scripts\activate  # Windows
 
-   # Install project dependencies
-   pip install -r requirements.txt
+   # Install runtime + development dependencies (ruff, pre-commit)
+   pip install -r requirements-dev.txt
 
    # Install pre-commit hooks
    pre-commit install
@@ -170,7 +184,7 @@ This project uses pre-commit to maintain code format. Pre-commit will automatica
 
 #### Setup Pre-commit
 
-1. Install pre-commit (already included in requirements.txt):
+1. Install pre-commit (already included in requirements-dev.txt):
 
    ```bash
    pip install pre-commit

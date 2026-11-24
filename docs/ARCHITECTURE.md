@@ -498,7 +498,7 @@ query --lazy_pinyin--> query_pinyin
 | `SUMATRA` | `SumatraPDF` | `pdf` | `icons/SUMATRA.png` | `%APPDATA%/SumatraPDF/SumatraPDF-settings.txt` |
 | `TYPORA` | `Typora` | `ty` | `icons/TYPORA.png` | `%APPDATA%/Typora/history.data` |
 
-> 注意：README 的缩写表里写的是 `SUMATRA_PDF`，代码注册键是 `SUMATRA`（见 13.1）。
+> 注意：注册键是 `SUMATRA`，缩写是 `pdf`；1.3.1 起 README 已同步（原文档误写 `SUMATRA_PDF`）。
 
 ## 9. 配置系统
 
