@@ -6,45 +6,66 @@ on:
     tags:
       - "v*"
   workflow_dispatch: # 保留手动触发选项
-  
-  # push 到 main 分支时触发工作流（可选）
-  # push:
-  #   branches: [ main ]
-  #   paths-ignore:
-  #     - .github/workflows/*
 
 permissions:
   contents: write
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    env:
-      python_ver: 3.11
-
+  build:
+    # Flow Launcher 只支持 Windows，发布物必须在 Windows 上构建：
+    # 这样 pip install -t lib 只会拿到纯 Python 包，不会再混入 Linux 的 .so。
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ env.python_ver }}
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.python_ver }}
-      - name: get version
+          python-version: "3.11"
+
+      - name: Install runtime dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -t ./lib
+
+      - name: Get version
         id: version
         uses: notiz-dev/github-action-json-property@release
         with:
           path: "plugin.json"
           prop_path: "Version"
-      - run: echo ${{steps.version.outputs.prop}}
-      - name: Install dependencies
+
+      - name: Stage package
+        shell: pwsh
         run: |
-          python -m pip install --upgrade pip
-          pip install -r ./requirements.txt -t ./lib
-          zip -r RecentProjectsOpen.zip . -x '*.git*'
+          $staging = "staging"
+          New-Item -ItemType Directory -Path $staging | Out-Null
+          Copy-Item main.py, plugin.json, README.md, LICENSE, SettingsTemplate.yaml -Destination $staging
+          Copy-Item icons, src, lib -Destination $staging -Recurse
+          # 发布包必须是纯 Python：Flow 用户可能使用任意解释器/平台，二进制扩展不可移植
+          $native = Get-ChildItem "$staging\lib" -Recurse -Include *.pyd, *.so
+          if ($native) {
+            throw "lib 中发现平台相关二进制：$($native.FullName -join ', ')"
+          }
+          Get-ChildItem $staging | Select-Object Name
+
+      - name: Create archive
+        shell: pwsh
+        run: |
+          Compress-Archive -Path staging\* -DestinationPath RecentProjectsOpen.zip -Force
+          Get-Item RecentProjectsOpen.zip | Select-Object Name, Length
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RecentProjectsOpen
+          path: RecentProjectsOpen.zip
+
       - name: Publish
-        if: success()
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
           files: "RecentProjectsOpen.zip"
-          tag_name: "v${{steps.version.outputs.prop}}"
+          tag_name: "v${{ steps.version.outputs.prop }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
