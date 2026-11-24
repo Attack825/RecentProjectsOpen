@@ -2,7 +2,6 @@ import json
 import os
 import urllib.parse
 
-from ..core.errors import StorageFileNotFound
 from ..core.logger import get_logger
 from ..core.project import Project
 from ..core.registry import ApplicationRegistry
@@ -25,8 +24,8 @@ class Vscode(BaseApplication):
             storage_file = os.path.join(
                 os.getenv("APPDATA"), "Code", "User", "globalStorage", "storage.json"
             )
-            if not os.path.exists(storage_file):
-                raise StorageFileNotFound(self.name, storage_file)
+        self.storage_file = storage_file
+        self.validate_storage()
         # 读取文件storage.json
         with open(storage_file, encoding="utf8") as f:
             data = json.loads(f.read())

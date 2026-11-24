@@ -10,6 +10,7 @@ from src.core.factory import ConcreteFactory
 from src.core.filter import Fuzzy_Filter
 from src.core.logger import get_logger
 from src.core.message import MessageDTO
+from src.core.naming import config_keys, icon_path
 
 logger = get_logger()
 
@@ -39,12 +40,13 @@ class RecentProjectsOpen(FlowLauncher):
             )
         else:
             app_name = acronyms_dict[acronyms]
-        icon_path = f"icons/{app_name}.png"
+        app_icon = icon_path(app_name)
         query = "".join(args.split(" ")[1:])
 
-        # 读取配置：缺少任一配置时返回提示，而不是让 None 传进 os.path 后抛异常
-        app_download = config.get(app_name + "_DOWNLOAD")
-        app_storage = config.get(app_name + "_STORAGE")
+        # 读取配置：键名由 naming 模块统一生成，避免三处字符串各写一遍
+        download_key, storage_key = config_keys(app_name)
+        app_download = config.get(download_key)
+        app_storage = config.get(storage_key)
         if not app_download or not app_storage:
             return MessageDTO.asWarnFlowMessage(
                 f"{app_name} app_download or app_storage is None",
@@ -66,7 +68,7 @@ class RecentProjectsOpen(FlowLauncher):
             )
         return MessageDTO().asMultiFlowMessage(
             projects=res,
-            icopath=icon_path,
+            icopath=app_icon,
             method="cmd_command",
             app_download=app_download,
         )

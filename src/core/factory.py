@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from .logger import get_logger
+from .naming import config_keys
 from .registry import ApplicationRegistry
 
 logger = get_logger()
@@ -68,8 +69,7 @@ class ConcreteFactory(AbstractFactory):
         if suggestions_list is None:
             suggestions_list = []
             for program_name in acronyms_dict.values():
-                download_key = program_name + "_DOWNLOAD"
-                storage_key = program_name + "_STORAGE"
+                download_key, storage_key = config_keys(program_name)
                 if download_key in plugin_config and storage_key in plugin_config:
                     suggestions_list.append(program_name)
 
