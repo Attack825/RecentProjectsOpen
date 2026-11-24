@@ -26,23 +26,18 @@ class Vscode(BaseApplication):
             )
             if not os.path.exists(storage_file):
                 raise FileNotFoundError("storage_file not found")
-        folder_urls = []
         # 读取文件storage.json
         with open(storage_file, encoding="utf8") as f:
             data = json.loads(f.read())
             profileAssociations = data.get("profileAssociations")
             workspaces = profileAssociations.get("workspaces")
             keys_list = list(workspaces.keys())
-            for i in range(len(keys_list) - 1, -1, -1):  # 倒序
-                if keys_list[i].startswith("file:///"):
-                    folder_urls.append(keys_list[i])
-        projects = []
-        for folder_url in folder_urls:
-            folder_url = folder_url.replace("file:///", "")
-            folder_url.replace("%3A", ":").replace("/", "\\")
-            folder_url = urllib.parse.unquote(folder_url)
-            folder_url = folder_url[0].upper() + folder_url[1:]
-            project = Project(self.name, folder_url)
-            projects.append(project)
+        # 倒序遍历，保持"最近打开的在前"
+        folder_urls = [key for key in reversed(keys_list) if key.startswith("file:///")]
+        return [Project(self.name, self._to_windows_path(url)) for url in folder_urls]
 
-        return projects
+    @staticmethod
+    def _to_windows_path(folder_url: str) -> str:
+        folder_url = folder_url.replace("file:///", "")
+        folder_url = urllib.parse.unquote(folder_url)
+        return folder_url[0].upper() + folder_url[1:]

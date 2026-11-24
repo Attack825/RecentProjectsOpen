@@ -52,7 +52,4 @@ class Typora(BaseApplication):
         # sort all items by timestamp in descending order
         all_items.sort(key=lambda x: x["timestamp"], reverse=True)
 
-        for item in all_items:
-            projects.append(Project(self.name, item["path"]))
-
-        return projects
+        return [Project(self.name, item["path"]) for item in all_items]

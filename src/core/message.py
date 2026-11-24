@@ -11,30 +11,19 @@ class MessageDTO:
     def asMultiFlowMessage(
         projects: list[Project], icopath, method: str, app_download: str
     ) -> list:
-        message_list = []
-
-        titles = [project.name for project in projects]
-        subtitles = [project.path for project in projects]
-        # jsonRPCAction参数
-        parameters = []
-        for project in projects:
-            command = project.get_command(app_download)
-            parameters.append({"ContentData": command, "parameters": command})
-
-        for i in range(len(titles)):
-            message_list.append(
-                {
-                    "Title": titles[i],  # unquote指示中文转码
-                    "SubTitle": subtitles[i],
-                    "IcoPath": icopath,
-                    "ContextData": parameters[i]["ContentData"],
-                    "jsonRPCAction": {
-                        "method": method,
-                        "parameters": parameters[i]["parameters"],
-                    },
-                }
-            )
-        return message_list
+        return [
+            {
+                "Title": project.name,  # unquote指示中文转码
+                "SubTitle": project.path,
+                "IcoPath": icopath,
+                "ContextData": project.get_command(app_download),
+                "jsonRPCAction": {
+                    "method": method,
+                    "parameters": project.get_command(app_download),
+                },
+            }
+            for project in projects
+        ]
 
     @staticmethod
     def asWarnFlowMessage(title, subTitle) -> list:

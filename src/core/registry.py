@@ -1,12 +1,13 @@
 import importlib
 import os
+from typing import ClassVar
 
 from ..application.base_application import BaseApplication
 
 
 class ApplicationRegistry:
-    _applications: dict[str, type[BaseApplication]] = {}
-    _acronyms_map: dict[str, str] = {}
+    _applications: ClassVar[dict[str, type[BaseApplication]]] = {}
+    _acronyms_map: ClassVar[dict[str, str]] = {}
 
     @classmethod
     def register(cls, app_name: str):
