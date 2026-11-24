@@ -152,16 +152,6 @@ To open a project named "MyProject" in Visual Studio Code, you would use:
 - [x] prevent configurations from disappearing after updates
 - [x] open in file explorer and copy absolute path
 
-## Troubleshooting
-
-| Symptom | Cause | Fix |
-| --- | --- | --- |
-| Flow shows `FlowPluginException` / `InvalidDataException` mentioning `UserWarning` or `fuzzywuzzy` | 1.3.0 shipped Linux-only compiled dependencies and wrote a warning to stderr; Flow treats any stderr byte as a failure | Upgrade to 1.3.1+ (the entry point isolates stderr) |
-| `... app_download or app_storage is None` | `Program Path` is missing the `DOWNLOAD` or `STORAGE` key for that app | Configure both keys for the app |
-| `... storage file not found: <path>` warning item | The `STORAGE` path is wrong, or the IDE has never opened a project | Point it at the settings file (not the folder) and verify the file exists |
-| Nothing happens, or Flow reports an invalid Python path | Flow is not configured with a working Python 3.9 – 3.13 interpreter | Set Flow Settings → Python Path |
-| Need to inspect plugin errors | The plugin no longer writes to stderr | Check `logs/stderr.log` and `logs/chat_*.log` in the plugin folder |
-
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, how to add a new
