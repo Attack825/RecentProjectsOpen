@@ -23,7 +23,7 @@ class SumatraPDF(BaseApplication):
             with open(self.storage_file, encoding="utf-8") as file:
                 settings_content = file.read()
         except FileNotFoundError:
-            print(f"Settings file not found: {self.storage_file}")
+            logger.warning("Settings file not found: %s", self.storage_file)
             return projects
 
         # 使用正则表达式匹配 FilePath

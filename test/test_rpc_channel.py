@@ -57,7 +57,9 @@ class JsonRpcChannelTest(unittest.TestCase):
             {
                 "method": "query",
                 "parameters": ["idea"],
-                "settings": {"program_path": "INTELLIJ_IDEA_DOWNLOAD=C:/fake/idea64.exe"},
+                "settings": {
+                    "program_path": "INTELLIJ_IDEA_DOWNLOAD=C:/fake/idea64.exe"
+                },
             }
         )
         proc = subprocess.run(
@@ -71,7 +73,35 @@ class JsonRpcChannelTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertEqual(proc.stderr, "")
         payload = json.loads(proc.stdout)
-        self.assertIn("app_download or app_storage is None", payload["result"][0]["Title"])
+        self.assertIn(
+            "app_download or app_storage is None", payload["result"][0]["Title"]
+        )
+
+    def test_missing_storage_file_keeps_stdout_parsable(self):
+        """配置缺失时应用层只能写日志，不能 print() 污染 stdout"""
+        program_path = (
+            "TYPORA_DOWNLOAD=C:/fake/typora.exe\n"
+            "TYPORA_STORAGE=D:/no/such/settings.json"
+        )
+        request = json.dumps(
+            {
+                "method": "query",
+                "parameters": ["ty"],
+                "settings": {"program_path": program_path},
+            }
+        )
+        proc = subprocess.run(
+            [sys.executable, os.path.join(ROOT, "main.py"), request],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=120,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(proc.stderr, "")
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["result"], [])
 
     def test_stderr_stays_empty_even_with_warnings_enabled(self):
         proc = self._run("idea", {"PYTHONWARNINGS": "always"})
