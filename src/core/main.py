@@ -4,6 +4,7 @@ import webbrowser
 
 from flowlauncher import FlowLauncher
 
+from src.core.acronyms import AcronymService
 from src.core.clipboard import copy_text
 from src.core.config import config
 from src.core.factory import ConcreteFactory
@@ -11,6 +12,7 @@ from src.core.filter import Fuzzy_Filter
 from src.core.logger import get_logger
 from src.core.message import MessageDTO
 from src.core.naming import config_keys, icon_path
+from src.core.suggestions import SuggestionService
 
 logger = get_logger()
 
@@ -28,10 +30,10 @@ class RecentProjectsOpen(FlowLauncher):
 
         # 如果没有输入参数，则根据 suggestions_list 展示建议列表
         if len(args) == 0:
-            return ConcreteFactory.get_application_message(config)
+            return SuggestionService.build(config)
 
         acronyms = args.split(" ")[0]
-        acronyms_dict = ConcreteFactory.get_application_acronyms(config)
+        acronyms_dict = AcronymService.get_map(config)
 
         if acronyms not in acronyms_dict:
             return MessageDTO.asWarnFlowMessage(
