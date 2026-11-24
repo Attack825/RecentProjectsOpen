@@ -1,15 +1,21 @@
 # Flow.Launcher.Plugin.RecentProjectsOpen
 
-A plugin that enables quick access to recent projects across various IDEs like VSCode and Intellij idea efficiency.
+A Flow Launcher plugin for quickly reopening recent projects in IDEs and editors such as VSCode, IntelliJ IDEA, PyCharm, and Typora.
 
 ## Installation
 
-Download from the store.
+Install from the plugin store (or download a release from GitHub).
 
-> **Requirements:** Python 3.9 – 3.13. The release package bundles every runtime
-> dependency under `lib/` (pure Python, no compiled extensions), so no extra
-> `pip install` is needed — in particular you no longer need to install
-> `Levenshtein` to avoid the "slow pure-python SequenceMatcher" warning.
+> **Requirements**
+>
+> - Flow Launcher 2.1.3 or newer (Windows only).
+> - A **Python 3.9 – 3.13** interpreter configured in Flow Launcher
+>   (Flow Settings → Python Path).
+>
+> The release package bundles every runtime dependency under `lib/` as pure
+> Python, so nothing has to be installed with `pip` inside the plugin folder.
+> Since 1.4.0 fuzzy matching uses the standard library, so the old
+> "install Levenshtein" workaround is no longer needed.
 
 ## Supported programs
 
@@ -35,11 +41,11 @@ You can access different programs using the following acronyms:
     "go": "GOLAND",
     "idea": "INTELLIJ_IDEA",
     "as": "ANDROID_STUDIO",
-    "cur":"CURSOR",
-    "pdf":"SUMATRA",
-    "trae":"TRAE",
-    "vscs":"VSCODE_SSH",
-    "ty": "TYPORA",
+    "cur": "CURSOR",
+    "pdf": "SUMATRA",
+    "trae": "TRAE",
+    "vscs": "VSCODE_SSH",
+    "ty": "TYPORA"
 }
 ```
 
@@ -56,8 +62,10 @@ All configurations can be done in the Settings Panel. Change the configurations 
   APP_STORAGE=C:/path/to/storage/file
   ```
 
-- Each program needs both DOWNLOAD and STORAGE entries
-- Example configuration:
+- Each program needs both DOWNLOAD and STORAGE entries, where `APP` is the
+  registration name from [Supported programs](#supported-programs)
+  (e.g. `VSCODE`, `INTELLIJ_IDEA`, `TYPORA`)
+- Example configuration (excerpt — add the apps you actually use):
 
   ```plaintext
   VSCODE_DOWNLOAD=D:/VSCode/bin/code
@@ -92,7 +100,7 @@ All configurations can be done in the Settings Panel. Change the configurations 
 
 ### Plugin Trigger Keyword
 
-- Make sure to update this configuration  when you change the trigger keyword of this plugin.
+- Make sure to update this configuration when you change the trigger keyword of this plugin.
 - It affects the usage of [Suggestions List](#suggestions-list).
 
 ### Custom Acronyms Map
@@ -119,25 +127,25 @@ To open a project named "MyProject" in Visual Studio Code, you would use:
 
 `r`
 
-![1752128883045](image/README/1752128883045.png)
+![Suggestions list shown when typing r](image/README/1752128883045.png)
 
 `r vsc`
 
-![1733284352742](image/README/1733284352742.png)
+![Configured applications after typing r vsc](image/README/1733284352742.png)
 
 `r vsc My`
 
-![1733284374591](image/README/1733284374591.png)
+![Filtered projects after typing r vsc My](image/README/1733284374591.png)
 
 `r vsc 空`
 
-![1733284760505](image/README/1733284760505.png)
+![Pinyin search after typing r vsc 空](image/README/1733284760505.png)
 
 `context menu`
 
-![1742873448581](image/README/1742873448581.png)
+![Context menu with copy path and open in explorer](image/README/1742873448581.png)
 
-## Feature
+## Features
 
 - [x] fuzzy search (prefix / substring / similarity, stdlib only)
 - [x] support pinyin
@@ -148,82 +156,13 @@ To open a project named "MyProject" in Visual Studio Code, you would use:
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Flow shows `FlowPluginException` / `InvalidDataException` mentioning `UserWarning` or `fuzzywuzzy` | 1.3.0 shipped Linux-only compiled dependencies and the plugin wrote a warning to stderr; Flow treats any stderr byte as a failure | Upgrade to 1.3.1+ (the entry point now isolates stderr) |
-| `... app_download or app_storage is None` | `Program Path` is missing the `DOWNLOAD` or `STORAGE` key | Configure both keys for the app |
-| Query returns no results | Wrong `STORAGE` path, or the IDE has never opened a project | Use an absolute path and verify the file exists |
+| Flow shows `FlowPluginException` / `InvalidDataException` mentioning `UserWarning` or `fuzzywuzzy` | 1.3.0 shipped Linux-only compiled dependencies and wrote a warning to stderr; Flow treats any stderr byte as a failure | Upgrade to 1.3.1+ (the entry point isolates stderr) |
+| `... app_download or app_storage is None` | `Program Path` is missing the `DOWNLOAD` or `STORAGE` key for that app | Configure both keys for the app |
+| `... storage file not found: <path>` warning item | The `STORAGE` path is wrong, or the IDE has never opened a project | Point it at the settings file (not the folder) and verify the file exists |
+| Nothing happens, or Flow reports an invalid Python path | Flow is not configured with a working Python 3.9 – 3.13 interpreter | Set Flow Settings → Python Path |
 | Need to inspect plugin errors | The plugin no longer writes to stderr | Check `logs/stderr.log` and `logs/chat_*.log` in the plugin folder |
 
-## Contribute
+## Contributing
 
-### Development Setup
-
-1. Fork and clone the repository
-2. Install development dependencies:
-
-   ```bash
-   # Create and activate virtual environment (recommended)
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   # or
-   .\venv\Scripts\activate  # Windows
-
-   # Install runtime + development dependencies (ruff, pre-commit)
-   pip install -r requirements-dev.txt
-
-   # Install pre-commit hooks
-   pre-commit install
-   ```
-
-3. Create a new file in `src/application` directory (e.g., `myapp.py`)
-4. Implement your application class by extending `BaseApplication` or `BaseJetBrains`
-5. Register your application using the `@ApplicationRegistry.register` decorator
-
-### Code Format with Pre-commit
-
-This project uses pre-commit to maintain code format. Pre-commit will automatically check your code before each commit.
-
-#### Setup Pre-commit
-
-1. Install pre-commit (already included in requirements-dev.txt):
-
-   ```bash
-   pip install pre-commit
-   ```
-
-2. Install the git hooks:
-
-   ```bash
-   pre-commit install
-   ```
-
-#### Available Hooks
-
-The project uses the following pre-commit hooks:
-
-1. **Ruff Formatter**:
-
-   - Automatically formats Python code
-   - Ensures consistent code style
-   - Usage: `pre-commit run ruff-format --all-files`
-
-2. **Ruff Linter**:
-
-   - Checks for common Python issues
-   - Fixes many issues automatically
-   - Shows detailed error messages
-   - Usage: `pre-commit run ruff-check --all-files`
-
-#### Running Pre-commit
-
-Pre-commit runs automatically on `git commit`, but you can also run it manually:
-
-```bash
-# Run on all files
-pre-commit run --all-files
-
-# Run a specific hook
-pre-commit run ruff-format --all-files
-
-# Run on staged files only
-pre-commit run
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, how to add a new
+application, and the checks that run in CI.

@@ -67,7 +67,8 @@ RecentProjectsOpen/
 ├── SettingsTemplate.yaml       # 设置面板 schema（4 个配置项）
 ├── requirements.txt            # 运行时依赖（纯 Python：flowlauncher / pypinyin / typing_extensions）
 ├── requirements-dev.txt        # 开发依赖（-r requirements.txt + ruff + pre-commit）
-├── README.md                   # 安装、路径配置、用法、贡献指南
+├── README.md                   # 安装、路径配置、用法、排障
+├── CONTRIBUTING.md             # 开发环境、检查命令、新增应用完整步骤
 │
 ├── src/
 │   ├── __init__.py
