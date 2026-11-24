@@ -3,6 +3,7 @@ import webbrowser
 
 from flowlauncher import FlowLauncher
 
+from src.core.clipboard import copy_text
 from src.core.config import config
 from src.core.factory import ConcreteFactory
 from src.core.filter import Fuzzy_Filter
@@ -142,9 +143,4 @@ class RecentProjectsOpen(FlowLauncher):
         )
 
     def copy_to_clipboard(self, text: str):
-        _ = subprocess.Popen(
-            ["echo", text, "|", "clip"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=True,
-        )
+        copy_text(text)
