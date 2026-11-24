@@ -8,6 +8,7 @@ from ..application.base_application import BaseApplication
 class ApplicationRegistry:
     _applications: ClassVar[dict[str, type[BaseApplication]]] = {}
     _acronyms_map: ClassVar[dict[str, str]] = {}
+    _loaded: ClassVar[bool] = False
 
     @classmethod
     def register(cls, app_name: str):

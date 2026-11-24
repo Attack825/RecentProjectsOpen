@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from typing import Any
 
 from ..core.errors import StorageFileNotFound
 from ..core.project import Project
@@ -18,16 +19,16 @@ class Typora(BaseApplication):
         """获取Typora最近打开的项目"""
         try:
             with open(self.storage_file, encoding="utf-8") as file:
-                settings_content = file.read()
+                raw_content = file.read()
         except FileNotFoundError:
             raise StorageFileNotFound(self.name, self.storage_file) from None
 
-        # decoding the hex string to bytes
-        buffer = bytes.fromhex(settings_content)
+        # history.data 是 hex 编码的 JSON
+        buffer = bytes.fromhex(raw_content)
         settings_content = json.loads(buffer.decode("utf-8"))
 
         # combine recentFolder and recentDocument
-        all_items = []
+        all_items: list[dict[str, Any]] = []
 
         if "recentFolder" in settings_content:
             for folder in settings_content["recentFolder"]:
@@ -41,7 +42,7 @@ class Typora(BaseApplication):
         if "recentDocument" in settings_content:
             for document in settings_content["recentDocument"]:
                 if "path" in document and "date" in document:
-                    timestamp = document["date"] / 1000
+                    timestamp = float(document["date"]) / 1000
                     all_items.append({"path": document["path"], "timestamp": timestamp})
 
         # sort all items by timestamp in descending order

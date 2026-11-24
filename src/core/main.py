@@ -129,7 +129,7 @@ class RecentProjectsOpen(FlowLauncher):
         """目录直接打开；文件则打开其所在目录。"""
         target = path if os.path.isdir(path) else os.path.dirname(path)
         if target:
-            os.startfile(target)  # type: ignore[attr-defined]
+            os.startfile(target)
 
     def open_url(self, url):
         webbrowser.open(url)

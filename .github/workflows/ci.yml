@@ -52,3 +52,7 @@ jobs:
       - name: Run pre-commit
         run: |
           pre-commit run --all-files
+
+      - name: Run mypy
+        run: |
+          mypy
