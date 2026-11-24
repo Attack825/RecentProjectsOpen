@@ -26,11 +26,6 @@ def get_logger(log_path=None):
         fh.setFormatter(formatter)
         logger.addHandler(fh)
 
-        sh = logging.StreamHandler()
-        sh.setLevel(logging.INFO)
-        sh.setFormatter(formatter)
-        logger.addHandler(sh)
-
     return logger
 
 
