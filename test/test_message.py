@@ -34,7 +34,11 @@ class TestMessageDTO(unittest.TestCase):
         self.assertEqual(first_msg["SubTitle"], "/path/to/project1")
         self.assertEqual(first_msg["IcoPath"], self.icon_path)
         self.assertEqual(
-            first_msg["ContextData"], [self.app_download, "/path/to/project1"]
+            first_msg["ContextData"],
+            {
+                "command": [self.app_download, "/path/to/project1"],
+                "path": "/path/to/project1",
+            },
         )
         self.assertEqual(
             first_msg["jsonRPCAction"],
@@ -48,7 +52,11 @@ class TestMessageDTO(unittest.TestCase):
         self.assertEqual(second_msg["Title"], "project2")
         self.assertEqual(second_msg["SubTitle"], "/path/to/project2")
         self.assertEqual(
-            second_msg["ContextData"], [self.app_download, "/path/to/project2"]
+            second_msg["ContextData"],
+            {
+                "command": [self.app_download, "/path/to/project2"],
+                "path": "/path/to/project2",
+            },
         )
         self.assertEqual(
             second_msg["jsonRPCAction"],

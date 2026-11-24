@@ -1,3 +1,4 @@
+import os
 import subprocess
 import webbrowser
 
@@ -11,6 +12,9 @@ from src.core.logger import get_logger
 from src.core.message import MessageDTO
 
 logger = get_logger()
+
+APP_ICON = "icons/app.png"
+REPO_URL = "https://github.com/Attack825/RecentProjectsOpen"
 
 
 class RecentProjectsOpen(FlowLauncher):
@@ -67,66 +71,61 @@ class RecentProjectsOpen(FlowLauncher):
             app_download=app_download,
         )
 
-    def context_menu(self, data: str) -> list:
-        """
-        使用任务管理器打开文件夹
-        复制文件夹路径
-        """
-        if data is None:
-            return MessageDTO.asDebugFlowMessage("data is None")
-        import re
+    def context_menu(self, data) -> list:
+        """右键菜单：复制路径 / 在资源管理器中打开 / 打开仓库。"""
+        path = self._extract_path(data)
+        normalized = os.path.normpath(path) if path else ""
 
-        # 正则表达式
-        pattern = r"^[A-Za-z]:/[\w\-/]+$"
-
-        if len(data) > 1 and re.match(pattern, data[1]):
-            return [
+        items = []
+        if normalized:
+            items.append(
                 {
-                    "title": "Copy path",
-                    "subTitle": "Press enter to copy the path",
-                    "icoPath": "icons/app.png",  # related path to the image
+                    "Title": "Copy path",
+                    "SubTitle": "Press enter to copy the path",
+                    "IcoPath": APP_ICON,
                     "jsonRPCAction": {
                         "method": "copy_to_clipboard",
-                        "parameters": [data[1]],
+                        "parameters": [normalized],
                     },
-                    "score": 0,
-                },
-                {
-                    "title": "Open in explorer",
-                    "subTitle": "Press enter to open the explorer",
-                    "icoPath": "icons/app.png",  # related path to the image
-                    "jsonRPCAction": {
-                        "method": "cmd_command",
-                        "parameters": ["start", data[1]],
-                    },
-                    "score": 0,
-                },
-                {
-                    "title": "RecentProjectsOpen's Context menu",
-                    "subTitle": "Press enter to open Flow the plugin's repo in GitHub",
-                    "icoPath": "icons/app.png",
-                    "jsonRPCAction": {
-                        "method": "open_url",
-                        "parameters": [
-                            "https://github.com/Attack825/RecentProjectsOpen"
-                        ],
-                    },
-                },
-            ]
-        else:
-            return MessageDTO.asWarnFlowMessage(
-                {
-                    "title": "RecentProjectsOpen's Context menu",
-                    "subTitle": "Press enter to open Flow the plugin's repo in GitHub",
-                    "icoPath": "icons/app.png",
-                    "jsonRPCAction": {
-                        "method": "open_url",
-                        "parameters": [
-                            "https://github.com/Attack825/RecentProjectsOpen"
-                        ],
-                    },
-                },
+                }
             )
+            if os.path.exists(normalized):
+                items.append(
+                    {
+                        "Title": "Open in explorer",
+                        "SubTitle": "Press enter to open the explorer",
+                        "IcoPath": APP_ICON,
+                        "jsonRPCAction": {
+                            "method": "open_in_explorer",
+                            "parameters": [normalized],
+                        },
+                    }
+                )
+        items.append(
+            {
+                "Title": "RecentProjectsOpen",
+                "SubTitle": "Press enter to open the plugin repository on GitHub",
+                "IcoPath": APP_ICON,
+                "jsonRPCAction": {"method": "open_url", "parameters": [REPO_URL]},
+            }
+        )
+        return items
+
+    @staticmethod
+    def _extract_path(data) -> str:
+        """ContextData 自 1.4.0 起为 {"command": [...], "path": ...}，同时兼容旧的命令数组。"""
+        if isinstance(data, dict):
+            return str(data.get("path") or "")
+        if isinstance(data, (list, tuple)) and data:
+            # 旧格式：命令数组，最后一个参数始终是项目路径（含 VSCode SSH）
+            return str(data[-1])
+        return ""
+
+    def open_in_explorer(self, path: str):
+        """目录直接打开；文件则打开其所在目录。"""
+        target = path if os.path.isdir(path) else os.path.dirname(path)
+        if target:
+            os.startfile(target)  # type: ignore[attr-defined]
 
     def open_url(self, url):
         webbrowser.open(url)

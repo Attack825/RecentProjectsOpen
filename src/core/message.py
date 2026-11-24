@@ -12,18 +12,21 @@ class MessageDTO:
         projects: list[Project], icopath, method: str, app_download: str
     ) -> list:
         return [
-            {
-                "Title": project.name,  # unquote指示中文转码
-                "SubTitle": project.path,
-                "IcoPath": icopath,
-                "ContextData": project.get_command(app_download),
-                "jsonRPCAction": {
-                    "method": method,
-                    "parameters": project.get_command(app_download),
-                },
-            }
+            MessageDTO._to_message(project, icopath, method, app_download)
             for project in projects
         ]
+
+    @staticmethod
+    def _to_message(project: Project, icopath, method: str, app_download: str) -> dict:
+        command = project.get_command(app_download)
+        return {
+            "Title": project.name,  # unquote指示中文转码
+            "SubTitle": project.path,
+            "IcoPath": icopath,
+            # 1.4.0 起 ContextData 结构化为 {command, path}，context_menu 不再猜哪个参数是路径
+            "ContextData": {"command": command, "path": project.path},
+            "jsonRPCAction": {"method": method, "parameters": command},
+        }
 
     @staticmethod
     def asWarnFlowMessage(title, subTitle) -> list:
