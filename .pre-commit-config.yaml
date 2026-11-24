@@ -1,13 +1,11 @@
 repos:
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.11.13
+  rev: v0.17.6
   hooks:
   - id: ruff-check
     types_or: [ python, pyi ]
     # 添加更多参数增强检查
     args: [ --fix, --show-fixes, --exit-non-zero-on-fix ]
-    # 排除测试目录中的某些检查
-    exclude: tests/
 
   - id: ruff-format
     types_or: [ python, pyi ]

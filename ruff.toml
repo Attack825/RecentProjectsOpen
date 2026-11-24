@@ -1,0 +1,16 @@
+# Ruff 配置。版本在 requirements.txt 与 .pre-commit-config.yaml 中锁定为 0.17.6，
+# 保证本地 / pre-commit / CI 使用同一套规则，避免"本地红、CI 绿"的版本漂移。
+#
+# 目标版本固定为 py39：插件需要支持 Python 3.9（issue #10 的环境），
+# 因此 3.10+ 才安全的语法（PEP 604 的 X | None）只允许在
+# "from __future__ import annotations" 的保护下使用。
+target-version = "py39"
+line-length = 88
+
+# docs 是架构文档，其中的示例代码不参与 lint/format；
+# lib 是发布时 pip install -t 生成的产物目录，不应被检查。
+extend-exclude = ["docs", "lib", ".venv", "venv"]
+
+[lint]
+# 渐进式启用：本 PR 只声明当前代码已满足的基线，随后由 style 分支逐步扩大规则集。
+select = ["E4", "E7", "E9", "F", "E402"]
