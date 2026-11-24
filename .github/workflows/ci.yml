@@ -12,7 +12,8 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        python-version: ["3.11"]
+        # 对齐用户实际环境：issue #10 使用 3.9，issue #11 使用 3.13
+        python-version: ["3.9", "3.11", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
